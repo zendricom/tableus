@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sayGoodbye = exports.sayHello = void 0;
-var funcs_1 = require("./funcs");
-Object.defineProperty(exports, "sayHello", { enumerable: true, get: function () { return funcs_1.sayHello; } });
-Object.defineProperty(exports, "sayGoodbye", { enumerable: true, get: function () { return funcs_1.sayGoodbye; } });
+exports.useTableus = void 0;
+var core_1 = require("./core");
+Object.defineProperty(exports, "useTableus", { enumerable: true, get: function () { return core_1.useTableus; } });
 //# sourceMappingURL=index.js.map

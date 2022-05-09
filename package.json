@@ -14,14 +14,17 @@
   "author": "moritz@zendri.com",
   "license": "ISC",
   "devDependencies": {
+    "@types/react-table": "^7.7.11",
     "@typescript-eslint/eslint-plugin": "^5.22.0",
     "@typescript-eslint/parser": "^5.22.0",
     "eslint": "^8.15.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-react": "^7.29.4",
-    "stylelint-config-prettier": "^9.0.3"
+    "stylelint-config-prettier": "^9.0.3",
+    "react": "^18.1.0",
+    "react-table": "^7.7.0"
   },
-  "dependencies": {
+  "peerDependencies": {
     "react": "^18.1.0",
     "react-table": "^7.7.0"
   }

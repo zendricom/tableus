@@ -1,1 +1,1 @@
-export { sayHello, sayGoodbye } from "./funcs";
+export { useTableus, Column } from "./core";
