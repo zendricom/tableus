@@ -1,8 +1,7 @@
 /// <reference types="react" />
 import { TableInstance as ReactTableInstance } from "react-table";
-interface Props {
-    reactTableInstance: ReactTableInstance;
+export interface Props<D extends object> {
+    reactTableInstance: ReactTableInstance<D>;
 }
-export declare function TableusRenderer({ reactTableInstance }: Props): JSX.Element;
-export {};
+export declare function TableusRenderer<D extends object>({ reactTableInstance, }: Props<D>): JSX.Element;
 //# sourceMappingURL=renderer.d.ts.map

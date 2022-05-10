@@ -3,11 +3,13 @@ import { useContext } from "react";
 import { UIContext } from "./context";
 import { TableInstance as ReactTableInstance } from "react-table";
 
-interface Props {
-  reactTableInstance: ReactTableInstance;
+export interface Props<D extends object> {
+  reactTableInstance: ReactTableInstance<D>;
 }
 
-export function TableusRenderer({ reactTableInstance }: Props) {
+export function TableusRenderer<D extends object>({
+  reactTableInstance,
+}: Props<D>) {
   const uiContext = useContext(UIContext);
   if (!uiContext?.UI) {
     throw new Error("No UI context provided");

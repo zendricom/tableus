@@ -36,7 +36,7 @@ function useTableus(options, data) {
     const reactTableOptions = (0, react_1.useMemo)(() => (Object.assign({ data, columns: getReactTableColumns(options.columns) }, options.reactTableOptions)), []);
     const reactTableInstance = (0, react_table_1.useTable)(reactTableOptions);
     return {
-        tableusProps: "test",
+        tableusProps: { reactTableInstance },
         selectedRows: [],
         reactTableInstance: reactTableInstance,
     };

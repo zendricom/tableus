@@ -7,7 +7,7 @@ exports.TableusRenderer = void 0;
 const react_1 = __importDefault(require("react"));
 const react_2 = require("react");
 const context_1 = require("./context");
-function TableusRenderer({ reactTableInstance }) {
+function TableusRenderer({ reactTableInstance, }) {
     const uiContext = (0, react_2.useContext)(context_1.UIContext);
     if (!(uiContext === null || uiContext === void 0 ? void 0 : uiContext.UI)) {
         throw new Error("No UI context provided");

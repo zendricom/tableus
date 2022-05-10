@@ -1,5 +1,6 @@
 /// <reference types="react" />
 import { Column as ReactTableColumn, TableInstance as ReactTableInstance, TableOptions as ReactTableOptions } from "react-table";
+import { Props as TableusProps } from "./renderer";
 interface HiddenSingleValueColumn<D extends object> {
     accessor: keyof D;
     isVisible: false;
@@ -29,7 +30,7 @@ interface TableOptions<D extends object> {
     reactTableOptions: Partial<ReactTableOptions<D>>;
 }
 interface TableStateInstance<D extends object> {
-    tableusProps: any;
+    tableusProps: TableusProps<D>;
     selectedRows: any[];
     reactTableInstance: ReactTableInstance<D>;
 }

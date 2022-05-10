@@ -5,6 +5,7 @@ import {
   TableOptions as ReactTableOptions,
   useTable,
 } from "react-table";
+import { Props as TableusProps } from "./renderer";
 
 interface HiddenSingleValueColumn<D extends object> {
   accessor: keyof D;
@@ -73,7 +74,7 @@ interface TableOptions<D extends object> {
 }
 
 interface TableStateInstance<D extends object> {
-  tableusProps: any;
+  tableusProps: TableusProps<D>;
   selectedRows: any[];
   reactTableInstance: ReactTableInstance<D>;
 }
@@ -120,7 +121,7 @@ export function useTableus<D extends object>(
 
   const reactTableInstance = useTable<D>(reactTableOptions);
   return {
-    tableusProps: "test",
+    tableusProps: { reactTableInstance },
     selectedRows: [],
     reactTableInstance: reactTableInstance,
   };
