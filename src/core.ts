@@ -5,10 +5,21 @@ import {
   TableOptions as ReactTableOptions,
   useTable,
 } from "react-table";
+import { Fetcher, useFetcher } from "./fetcher";
 import { Props as TableusProps } from "./renderer";
 
+type PathImpl<T, K extends keyof T> = K extends string
+  ? T[K] extends Record<string, any>
+    ? T[K] extends ArrayLike<any>
+      ? K | `${K}.${PathImpl<T[K], Exclude<keyof T[K], keyof any[]>>}`
+      : K | `${K}.${PathImpl<T[K], keyof T[K]>}`
+    : K
+  : never;
+
+type Path<T> = PathImpl<T, keyof T> | keyof T;
+
 interface HiddenSingleValueColumn<D extends object> {
-  accessor: keyof D;
+  accessor: Path<D>;
   isVisible: false;
 }
 
@@ -21,7 +32,7 @@ function isHiddenSingleValueColumn<D extends object>(
 }
 
 interface SingleValueColumn<D extends object> {
-  accessor: keyof D;
+  accessor: Path<D>;
   Header: string | (() => JSX.Element);
 }
 
@@ -69,6 +80,8 @@ interface TableConfig {
 
 interface TableOptions<D extends object> {
   columns: Column<D>[];
+  fetcher: Fetcher<D>;
+  key: string;
   config: TableConfig;
   reactTableOptions: Partial<ReactTableOptions<D>>;
 }
@@ -107,16 +120,29 @@ function getReactTableColumns<D extends object>(
 }
 
 export function useTableus<D extends object>(
-  options: TableOptions<D>,
-  data: D[]
+  options: TableOptions<D>
 ): TableStateInstance<D> {
+  const { columns, fetcher, config, key } = options;
+
+  const reactTableColumns = useMemo(
+    () => getReactTableColumns(columns),
+    [columns]
+  );
+
+  const { data, isLoading, error } = useFetcher<D>({
+    fetcher,
+    columns,
+    tableState: {},
+    key,
+  });
+
   const reactTableOptions: ReactTableOptions<D> = useMemo(
     () => ({
-      data,
-      columns: getReactTableColumns(options.columns),
+      data: data ?? [],
+      columns: reactTableColumns,
       ...options.reactTableOptions,
     }),
-    []
+    [data]
   );
 
   const reactTableInstance = useTable<D>(reactTableOptions);

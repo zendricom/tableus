@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.useTableus = void 0;
 const react_1 = require("react");
 const react_table_1 = require("react-table");
+const fetcher_1 = require("./fetcher");
 function isHiddenSingleValueColumn(column) {
     return ("isVisible" in column && column.isVisible === false && !("Header" in column));
 }
@@ -32,8 +33,16 @@ function getReactTableColumns(columns) {
         throw new Error("Unknown column type");
     }); // temorary fix
 }
-function useTableus(options, data) {
-    const reactTableOptions = (0, react_1.useMemo)(() => (Object.assign({ data, columns: getReactTableColumns(options.columns) }, options.reactTableOptions)), []);
+function useTableus(options) {
+    const { columns, fetcher, config, key } = options;
+    const reactTableColumns = (0, react_1.useMemo)(() => getReactTableColumns(columns), [columns]);
+    const { data, isLoading, error } = (0, fetcher_1.useFetcher)({
+        fetcher,
+        columns,
+        tableState: {},
+        key,
+    });
+    const reactTableOptions = (0, react_1.useMemo)(() => (Object.assign({ data: data !== null && data !== void 0 ? data : [], columns: reactTableColumns }, options.reactTableOptions)), [data]);
     const reactTableInstance = (0, react_table_1.useTable)(reactTableOptions);
     return {
         tableusProps: { reactTableInstance },

@@ -1,12 +1,15 @@
 /// <reference types="react" />
 import { Column as ReactTableColumn, TableInstance as ReactTableInstance, TableOptions as ReactTableOptions } from "react-table";
+import { Fetcher } from "./fetcher";
 import { Props as TableusProps } from "./renderer";
+declare type PathImpl<T, K extends keyof T> = K extends string ? T[K] extends Record<string, any> ? T[K] extends ArrayLike<any> ? K | `${K}.${PathImpl<T[K], Exclude<keyof T[K], keyof any[]>>}` : K | `${K}.${PathImpl<T[K], keyof T[K]>}` : K : never;
+declare type Path<T> = PathImpl<T, keyof T> | keyof T;
 interface HiddenSingleValueColumn<D extends object> {
-    accessor: keyof D;
+    accessor: Path<D>;
     isVisible: false;
 }
 interface SingleValueColumn<D extends object> {
-    accessor: keyof D;
+    accessor: Path<D>;
     Header: string | (() => JSX.Element);
 }
 interface MultiValueColumn {
@@ -26,6 +29,8 @@ interface TableConfig {
 }
 interface TableOptions<D extends object> {
     columns: Column<D>[];
+    fetcher: Fetcher<D>;
+    key: string;
     config: TableConfig;
     reactTableOptions: Partial<ReactTableOptions<D>>;
 }
@@ -34,6 +39,6 @@ interface TableStateInstance<D extends object> {
     selectedRows: any[];
     reactTableInstance: ReactTableInstance<D>;
 }
-export declare function useTableus<D extends object>(options: TableOptions<D>, data: D[]): TableStateInstance<D>;
+export declare function useTableus<D extends object>(options: TableOptions<D>): TableStateInstance<D>;
 export {};
 //# sourceMappingURL=core.d.ts.map
