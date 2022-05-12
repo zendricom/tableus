@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { Column } from "./core";
+import { Column } from "../core/types";
 import { useQuery } from "react-query";
 
 export interface FetchArgs<D extends object> {
@@ -28,6 +27,5 @@ export function useFetcher<D extends object>({
   const { isLoading, error, data } = useQuery(`${key}-fetch`, () =>
     fetcher.fetch({ columns, tableState })
   );
-  console.log("useFetcher", { isLoading, error, data });
   return { data, isLoading, error };
 }

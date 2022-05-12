@@ -1,5 +1,6 @@
-export { useTableus, Column } from "./core";
-export { UIContext } from "./context";
+export { useTableus } from "./core/index";
+export { Column } from "./core/types";
+export { UIContext } from "./ui/context";
 export { Bootstrap5UI } from "./ui/bootstrap5";
-export { TableusRenderer as Tableus } from "./renderer";
+export { TableusRenderer as Tableus } from "./renderer/index";
 export { LaravelRestFetcher } from "./fetcher/laravel-rest-fetcher";

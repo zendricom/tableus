@@ -1,7 +1,7 @@
 import React from "react";
 import { Table, TableProps } from "react-bootstrap";
-import { Props, UI } from "../context";
-import { ValidJSX } from "../types/helpers";
+import { Props, UI } from "../ui/context";
+import { ValidJSX } from "../helpers/types";
 
 interface Config {
   tableProps: TableProps;

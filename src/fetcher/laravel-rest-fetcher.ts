@@ -1,4 +1,4 @@
-import { FetchArgs, Fetcher } from "../fetcher";
+import { FetchArgs, Fetcher } from "./index";
 
 export class LaravelRestFetcher<D extends object> implements Fetcher<D> {
   constructor(private readonly url: string) {}

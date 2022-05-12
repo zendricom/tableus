@@ -1,5 +1,5 @@
 import { createContext, ReactNode } from "react";
-import { ValidJSX } from "./types/helpers";
+import { ValidJSX } from "../helpers/types";
 
 export type Props = {
   children: ReactNode;

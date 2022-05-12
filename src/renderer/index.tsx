@@ -1,6 +1,6 @@
 import React from "react";
 import { useContext } from "react";
-import { UIContext } from "./context";
+import { UIContext } from "../ui/context";
 import { TableInstance as ReactTableInstance } from "react-table";
 
 export interface Props<D extends object> {

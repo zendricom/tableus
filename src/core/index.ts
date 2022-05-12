@@ -5,71 +5,14 @@ import {
   TableOptions as ReactTableOptions,
   useTable,
 } from "react-table";
-import { Fetcher, useFetcher } from "./fetcher";
-import { Props as TableusProps } from "./renderer";
-
-type PathImpl<T, K extends keyof T> = K extends string
-  ? T[K] extends Record<string, any>
-    ? T[K] extends ArrayLike<any>
-      ? K | `${K}.${PathImpl<T[K], Exclude<keyof T[K], keyof any[]>>}`
-      : K | `${K}.${PathImpl<T[K], keyof T[K]>}`
-    : K
-  : never;
-
-type Path<T> = PathImpl<T, keyof T> | keyof T;
-
-interface HiddenSingleValueColumn<D extends object> {
-  accessor: Path<D>;
-  isVisible: false;
-}
-
-function isHiddenSingleValueColumn<D extends object>(
-  column: Column<D>
-): column is HiddenSingleValueColumn<D> {
-  return (
-    "isVisible" in column && column.isVisible === false && !("Header" in column)
-  );
-}
-
-interface SingleValueColumn<D extends object> {
-  accessor: Path<D>;
-  Header: string | (() => JSX.Element);
-}
-
-function isSingleValueColumn<D extends object>(
-  column: Column<D>
-): column is SingleValueColumn<D> {
-  if ("isVisible" in column && column.isVisible === false) {
-    return false;
-  }
-  return "accessor" in column && "Header" in column;
-}
-
-interface MultiValueColumn {
-  Cell: (cell: any) => JSX.Element;
-  Header: string | (() => JSX.Element);
-  key: string;
-}
-
-function isMultiValueColumn<D extends object>(
-  column: Column<D>
-): column is MultiValueColumn {
-  if ("isVisible" in column && column.isVisible === false) {
-    return false;
-  }
-  return "Cell" in column && "Header" in column && "key" in column;
-}
-
-interface ColumnOptions<D extends object> {
-  reactTableOptions?: Partial<ReactTableColumn<D>>;
-}
-
-export type Column<D extends object> = (
-  | HiddenSingleValueColumn<D>
-  | SingleValueColumn<D>
-  | MultiValueColumn
-) &
-  ColumnOptions<D>;
+import { Fetcher, useFetcher } from "../fetcher/index";
+import { Props as TableusProps } from "../renderer/index";
+import {
+  Column,
+  isHiddenSingleValueColumn,
+  isMultiValueColumn,
+  isSingleValueColumn,
+} from "./types";
 
 interface TableConfig {
   rowSelect?: boolean;
