@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useContext } from "react";
 import { UIContext } from "../ui/context";
 import { TableInstance as ReactTableInstance } from "react-table";
@@ -18,34 +18,43 @@ export function TableusRenderer<D extends object>({
 
   const { getTableProps, headerGroups, rows, prepareRow } = reactTableInstance;
 
+  const Table = useMemo(() => UI.getTableComponent(), [UI]);
+  const TableHead = useMemo(() => UI.getTableHeadComponent(), [UI]);
+  const TableHeadRow = useMemo(() => UI.getTableHeadRowComponent(), [UI]);
+  const TableHeadCell = useMemo(() => UI.getTableHeadCellComponent(), [UI]);
+  const TableBody = useMemo(() => UI.getTableBodyComponent(), [UI]);
+  const TableRow = useMemo(() => UI.getTableRowComponent(), [UI]);
+  const TableCell = useMemo(() => UI.getTableCellComponent(), [UI]);
+  // const TablePagination = useMemo(() => UI.getTablePaginationComponent(), [UI]);
+  // const TablePaginationActions = useMemo(() => UI.getTablePaginationActionsComponent(), [UI]);
+
   return (
-    <UI.Table {...getTableProps()}>
-      <UI.TableHead>
+    <Table {...getTableProps()}>
+      <TableHead>
         {headerGroups.map((headerGroup) => (
-          <UI.TableHeadRow {...headerGroup.getHeaderGroupProps()}>
+          <TableHeadRow {...headerGroup.getHeaderGroupProps()}>
             {headerGroup.headers.map((column) => (
-              <UI.TableHeadCell {...column.getHeaderProps()}>
+              <TableHeadCell {...column.getHeaderProps()}>
                 {column.render("Header")}
-              </UI.TableHeadCell>
+              </TableHeadCell>
             ))}
-            <UI.TableHeadCell>Age</UI.TableHeadCell>
-          </UI.TableHeadRow>
+          </TableHeadRow>
         ))}
-      </UI.TableHead>
-      <UI.TableBody>
+      </TableHead>
+      <TableBody>
         {rows.map((row) => {
           prepareRow(row);
           return (
-            <UI.TableRow {...row.getRowProps()}>
+            <TableRow {...row.getRowProps()}>
               {row.cells.map((cell) => (
-                <UI.TableCell {...cell.getCellProps()}>
+                <TableCell {...cell.getCellProps()}>
                   {cell.render("Cell")}
-                </UI.TableCell>
+                </TableCell>
               ))}
-            </UI.TableRow>
+            </TableRow>
           );
         })}
-      </UI.TableBody>
-    </UI.Table>
+      </TableBody>
+    </Table>
   );
 }

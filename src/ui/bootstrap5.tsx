@@ -1,40 +1,170 @@
 import React from "react";
-import { Table, TableProps } from "react-bootstrap";
+import {
+  OverlayTrigger,
+  Table as BootstrapTable,
+  TableProps,
+  Tooltip,
+} from "react-bootstrap";
 import { Props, UI } from "../ui/context";
-import { ValidJSX } from "../helpers/types";
+import dayjs from "dayjs";
+
+const DEFAULT_EMPTY_VALUE = "-";
 
 interface Config {
   tableProps: TableProps;
+  emptyValue: string;
+}
+
+interface BootstrapProps extends Props {
+  config: Config;
+}
+
+function Table(props: BootstrapProps) {
+  return (
+    <BootstrapTable {...props.config.tableProps}>
+      {props.children}
+    </BootstrapTable>
+  );
+}
+
+function TableHead(props: BootstrapProps) {
+  return <thead>{props.children}</thead>;
+}
+
+function TableHeadRow(props: BootstrapProps) {
+  return <tr>{props.children}</tr>;
+}
+
+function TableHeadCell(props: BootstrapProps) {
+  return <th>{props.children}</th>;
+}
+
+function TableBody(props: BootstrapProps) {
+  return <tbody>{props.children}</tbody>;
+}
+
+function TableRow(props: BootstrapProps) {
+  return <tr>{props.children}</tr>;
+}
+
+function TableCell(props: BootstrapProps) {
+  return <td>{props.children}</td>;
+}
+
+function DateCell({ date, config }: { date: string; config: Config }) {
+  if (!date) return <>{config.emptyValue}</>;
+  return <>{dayjs(date).format("DD.MM.YYYY")}</>;
+}
+
+function DatetimeCell({ date, config }: { date: string; config: Config }) {
+  if (!date) return <>{config.emptyValue}</>;
+  return <>{dayjs(date).format("DD.MM.YYYY HH:mm")}</>;
 }
 
 export class Bootstrap5UI implements UI {
-  constructor(private config?: Config) {}
-
-  Table(props: Props): ValidJSX {
-    return <Table {...this?.config?.tableProps}>{props.children}</Table>;
+  private config: Required<Config>;
+  constructor(config?: Partial<Config>) {
+    this.config = {
+      ...{
+        tableProps: {},
+        emptyValue: DEFAULT_EMPTY_VALUE,
+      },
+      ...config,
+    };
   }
 
-  TableHead(props: Props): ValidJSX {
-    return <thead>{props.children}</thead>;
+  getTableComponent() {
+    return (props: Props) => {
+      return <Table {...props} config={this.config} />;
+    };
   }
 
-  TableHeadRow(props: Props): ValidJSX {
-    return <tr>{props.children}</tr>;
+  getTableHeadComponent() {
+    return (props: Props) => {
+      return <TableHead {...props} config={this.config} />;
+    };
   }
 
-  TableHeadCell(props: Props): ValidJSX {
-    return <th>{props.children}</th>;
+  getTableHeadRowComponent() {
+    return (props: Props) => {
+      return <TableHeadRow {...props} config={this.config} />;
+    };
   }
 
-  TableBody(props: Props): ValidJSX {
-    return <tbody>{props.children}</tbody>;
+  getTableHeadCellComponent() {
+    return (props: Props) => {
+      return <TableHeadCell {...props} config={this.config} />;
+    };
   }
 
-  TableRow(props: Props): ValidJSX {
-    return <tr>{props.children}</tr>;
+  getTableBodyComponent() {
+    return (props: Props) => {
+      return <TableBody {...props} config={this.config} />;
+    };
   }
 
-  TableCell(props: Props): ValidJSX {
-    return <td>{props.children}</td>;
+  getTableRowComponent() {
+    return (props: Props) => {
+      return <TableRow {...props} config={this.config} />;
+    };
+  }
+
+  getTableCellComponent() {
+    return (props: Props) => {
+      return <TableCell {...props} config={this.config} />;
+    };
+  }
+
+  getDateCellComponent() {
+    return ({ value }: { value: string }) => {
+      return DateCell({ date: value, config: this.config });
+    };
+  }
+
+  getDateTimeCellComponent() {
+    return ({ value }: { value: string }) => {
+      return DatetimeCell({ date: value, config: this.config });
+    };
+  }
+
+  getEmptyValueComponent() {
+    return () => {
+      return <>{this.config.emptyValue}</>;
+    };
+  }
+
+  getTooltipComponent(): React.ComponentType<{
+    children: React.ReactNode;
+    text: string;
+  }> {
+    return ({ children, text }) => (
+      <OverlayTrigger overlay={<Tooltip> {text} </Tooltip>}>
+        <div>{children}</div>
+      </OverlayTrigger>
+    );
+  }
+
+  getLinkComponent(): React.ComponentType<{
+    children: React.ReactNode;
+    href: string;
+  }> {
+    return ({ children, href }) => <a href={href}> {children} </a>;
+  }
+
+  getComponents() {
+    return {
+      Table: this.getTableComponent(),
+      TableHead: this.getTableHeadComponent(),
+      TableHeadRow: this.getTableHeadRowComponent(),
+      TableHeadCell: this.getTableHeadCellComponent(),
+      TableBody: this.getTableBodyComponent(),
+      TableRow: this.getTableRowComponent(),
+      TableCell: this.getTableCellComponent(),
+      DateCell: this.getDateCellComponent(),
+      DatetimeCell: this.getDateTimeCellComponent(),
+      EmptyValue: this.getEmptyValueComponent(),
+      TooltipComponent: this.getTooltipComponent(),
+      LinkComponent: this.getLinkComponent(),
+    };
   }
 }

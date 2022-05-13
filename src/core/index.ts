@@ -1,18 +1,16 @@
-import { useMemo } from "react";
+import { useContext, useMemo } from "react";
 import {
-  Column as ReactTableColumn,
   TableInstance as ReactTableInstance,
   TableOptions as ReactTableOptions,
   useTable,
 } from "react-table";
+
 import { Fetcher, useFetcher } from "../fetcher/index";
 import { Props as TableusProps } from "../renderer/index";
-import {
-  Column,
-  isHiddenSingleValueColumn,
-  isMultiValueColumn,
-  isSingleValueColumn,
-} from "./types";
+import { UIContext } from "../ui/context";
+import { translateColumns } from "./translator/index";
+
+import { Column } from "./types";
 
 interface TableConfig {
   rowSelect?: boolean;
@@ -35,40 +33,20 @@ interface TableStateInstance<D extends object> {
   reactTableInstance: ReactTableInstance<D>;
 }
 
-function getReactTableColumns<D extends object>(
-  columns: Column<D>[]
-): ReactTableColumn<D>[] {
-  return columns.map((column) => {
-    if (isHiddenSingleValueColumn<D>(column)) {
-      return {
-        accessor: column.accessor,
-        ...column.reactTableOptions,
-      };
-    } else if (isSingleValueColumn<D>(column)) {
-      return {
-        Header: column.Header,
-        accessor: column.accessor,
-        ...column.reactTableOptions,
-      };
-    } else if (isMultiValueColumn<D>(column)) {
-      return {
-        Header: column.Header,
-        id: column.key,
-        Cell: column.Cell,
-        ...column.reactTableOptions,
-      };
-    }
-    throw new Error("Unknown column type");
-  }) as ReactTableColumn<D>[]; // temorary fix
-}
-
 export function useTableus<D extends object>(
   options: TableOptions<D>
 ): TableStateInstance<D> {
   const { columns, fetcher, config, key } = options;
 
+  const uiContext = useContext(UIContext);
+  if (!uiContext?.UI) {
+    throw new Error("UI context not found");
+  }
+  const { UI } = uiContext;
+  const UIComponents = UI.getComponents();
+
   const reactTableColumns = useMemo(
-    () => getReactTableColumns(columns),
+    () => translateColumns(columns, UIComponents),
     [columns]
   );
 
