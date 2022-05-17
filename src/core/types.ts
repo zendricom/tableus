@@ -7,6 +7,7 @@ export type ColumnValueType = "date" | "datetime";
 export interface HiddenSingleValueColumn<D extends object> {
   accessor: Accessor<D>;
   isVisible: false;
+  isId?: boolean;
 }
 
 export function isHiddenSingleValueColumn<D extends object>(
@@ -17,13 +18,17 @@ export function isHiddenSingleValueColumn<D extends object>(
   );
 }
 
+export interface VisibleColumnOptions<D extends object> {
+  link?: (props: EasyCellProps<D>) => string;
+  tooltip?: (props: EasyCellProps<D>) => string;
+}
+
 export interface SingleValueColumn<D extends object> {
   accessor: Accessor<D>;
   Header: string | (() => JSX.Element);
-  Cell?: Renderer<CellProps<D, any>> | undefined;
+  Cell?: Renderer<EasyCellProps<D>> | undefined;
   type?: ColumnValueType;
-  link?: string;
-  tooltip?: string;
+  isId?: boolean;
 }
 
 export function isSingleValueColumn<D extends object>(
@@ -36,11 +41,9 @@ export function isSingleValueColumn<D extends object>(
 }
 
 export interface MultiValueColumn<D extends object> {
-  Cell: Renderer<CellProps<D, any>> | undefined;
+  Cell: Renderer<EasyCellProps<D>>;
   Header: string | (() => JSX.Element);
   key: string;
-  link?: string;
-  tooltip?: string;
 }
 
 export function isMultiValueColumn<D extends object>(
@@ -58,7 +61,13 @@ export interface ColumnOptions<D extends object> {
 
 export type Column<D extends object> = (
   | HiddenSingleValueColumn<D>
-  | SingleValueColumn<D>
-  | MultiValueColumn<D>
+  | ((SingleValueColumn<D> | MultiValueColumn<D>) & VisibleColumnOptions<D>)
 ) &
   ColumnOptions<D>;
+
+export interface EasyCellProps<D extends object> {
+  value: any;
+  data: D;
+  cellProps: CellProps<D>;
+  id?: any;
+}

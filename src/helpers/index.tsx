@@ -1,16 +1,13 @@
 import React, { ComponentType } from "react";
 import { CellProps, Renderer } from "react-table";
 
-export function flexRender<D extends object>(
-  Comp: Renderer<CellProps<D>>,
-  props: CellProps<D>
-) {
+export function flexRender(Comp: Renderer<any>, props: any) {
   return isReactComponent(Comp) ? <Comp {...props} /> : Comp;
 }
 
-function isReactComponent<D extends object>(
-  component: Renderer<CellProps<D>>
-): component is ComponentType<CellProps<D>> {
+function isReactComponent(
+  component: Renderer<any>
+): component is ComponentType<any> {
   return (
     isClassComponent(component) ||
     typeof component === "function" ||
@@ -18,7 +15,7 @@ function isReactComponent<D extends object>(
   );
 }
 
-function isClassComponent<D extends object>(component: Renderer<CellProps<D>>) {
+function isClassComponent(component: Renderer<any>) {
   return (
     typeof component === "function" &&
     (() => {
@@ -28,9 +25,7 @@ function isClassComponent<D extends object>(component: Renderer<CellProps<D>>) {
   );
 }
 
-function isExoticComponent<D extends object>(
-  component: Renderer<CellProps<D>>
-) {
+function isExoticComponent(component: Renderer<any>) {
   return (
     typeof component === "object" &&
     // @ts-ignore

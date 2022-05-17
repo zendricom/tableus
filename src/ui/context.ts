@@ -1,6 +1,4 @@
 import { createContext, ReactNode } from "react";
-import { CellProps } from "react-table";
-import { ValidJSX } from "../helpers/types";
 
 export type Props = {
   children: ReactNode;

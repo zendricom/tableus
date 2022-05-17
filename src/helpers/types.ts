@@ -1,6 +1,12 @@
-import { ReactElement } from "react";
+import { ReactElement, ReactFragment } from "react";
 
-export type ValidJSX = JSX.Element | ReactElement | string | null;
+export type ValidJSX =
+  | JSX.Element
+  | ReactElement
+  | string
+  | null
+  | number
+  | ReactFragment;
 
 type PathImpl<T, K extends keyof T> = K extends string
   ? T[K] extends Record<string, any>
