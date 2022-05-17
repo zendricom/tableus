@@ -19,7 +19,6 @@ export const Test = () => {
     () => [
       {
         accessor: "id",
-        isVisible: false,
         isId: true,
       },
       {

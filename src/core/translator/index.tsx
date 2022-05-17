@@ -4,8 +4,6 @@ import {
   Column,
   ColumnOptions,
   EasyCellProps,
-  HiddenSingleValueColumn,
-  isHiddenSingleValueColumn,
   isMultiValueColumn,
   isSingleValueColumn,
   MultiValueColumn,
@@ -38,9 +36,7 @@ class ColumnTranslator<D extends object> {
 
   translateColumns(): ReactTableColumn<D>[] {
     return this.columns.map((column) => {
-      if (isHiddenSingleValueColumn(column)) {
-        return this.translateHiddenSingleValueColumn(column);
-      } else if (isSingleValueColumn(column)) {
+      if (isSingleValueColumn(column)) {
         return this.translateSingleValueColumn(column);
       } else if (isMultiValueColumn(column)) {
         return this.translateMultiValueColumn(column);
@@ -49,23 +45,10 @@ class ColumnTranslator<D extends object> {
     }) as ReactTableColumn<D>[]; // temorary fix
   }
 
-  findIdColumn():
-    | SingleValueColumn<D>
-    | HiddenSingleValueColumn<D>
-    | undefined {
+  findIdColumn(): SingleValueColumn<D> | undefined {
     return this.columns.find((column) => "isId" in column && column.isId) as
       | SingleValueColumn<D>
-      | HiddenSingleValueColumn<D>
       | undefined;
-  }
-
-  translateHiddenSingleValueColumn(
-    column: HiddenSingleValueColumn<D> & ColumnOptions<D>
-  ) {
-    return {
-      accessor: column.accessor,
-      ...column.reactTableOptions,
-    };
   }
 
   translateSingleValueColumn(column: SingleValueColumn<D> & ColumnOptions<D>) {
