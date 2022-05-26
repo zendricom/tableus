@@ -28,7 +28,7 @@ export interface LinkProps {
   href: string;
 }
 
-export interface UI {
+export interface TableUI {
   Table: TableComponent;
   TableHead: TableComponent;
   TableHeadRow: TableComponent;
@@ -37,18 +37,24 @@ export interface UI {
   TableRow: TableComponent;
   TableCell: TableComponent;
 
+  TablePagination?: TableComponent;
+  TablePaginationActions?: TableComponent;
+}
+
+export interface TableusConfig {
+  tableUI: TableUI;
+
   EmptyValue: () => ReactNode;
 
   DateCell?: ({ value }: { value: string }) => ReactNode;
   DatetimeCell?: ({ value }: { value: string }) => ReactNode;
-  TablePagination?: TableComponent;
-  TablePaginationActions?: TableComponent;
+
   Link?: ComponentType<LinkProps>;
   Tooltip?: ComponentType<TooltipProps>;
 }
 
 interface Context {
-  UI: UI;
+  config: TableusConfig;
 }
 
-export const UIContext = createContext<Context | null>(null);
+export const TableusContext = createContext<Context | null>(null);

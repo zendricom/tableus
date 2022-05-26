@@ -1,61 +1,16 @@
 import React from "react";
 import {
-  OverlayTrigger,
   Pagination as BootstrapPagination,
   Table as BootstrapTable,
   TableProps,
-  Tooltip,
 } from "react-bootstrap";
-import {
-  LinkProps,
-  PaginationProps,
-  Props,
-  TooltipProps,
-  UI,
-} from "../ui/context";
-import dayjs from "dayjs";
+import { PaginationProps, Props, TableUI } from "../context";
 
 const DEFAULT_EMPTY_VALUE = "-";
 
 interface Config {
   tableProps: TableProps;
   emptyValue: string;
-}
-
-interface BootstrapProps extends Props {
-  config: Config;
-}
-
-function Table(props: BootstrapProps) {
-  return (
-    <BootstrapTable {...props.config.tableProps}>
-      {props.children}
-    </BootstrapTable>
-  );
-}
-
-function TableHead(props: BootstrapProps) {
-  return <thead>{props.children}</thead>;
-}
-
-function TableHeadRow(props: BootstrapProps) {
-  return <tr>{props.children}</tr>;
-}
-
-function TableHeadCell(props: BootstrapProps) {
-  return <th>{props.children}</th>;
-}
-
-function TableBody(props: BootstrapProps) {
-  return <tbody>{props.children}</tbody>;
-}
-
-function TableRow(props: BootstrapProps) {
-  return <tr>{props.children}</tr>;
-}
-
-function TableCell(props: BootstrapProps) {
-  return <td>{props.children}</td>;
 }
 
 function Pagination({ state }: PaginationProps) {
@@ -80,67 +35,43 @@ function Pagination({ state }: PaginationProps) {
   );
 }
 
-export class Bootstrap5UI implements UI {
-  private config: Required<Config>;
-  constructor(config?: Partial<Config>) {
-    this.config = {
-      ...{
-        tableProps: {},
-        emptyValue: DEFAULT_EMPTY_VALUE,
-      },
-      ...config,
-    };
-  }
-
-  Table = (props: Props) => {
-    return <Table {...props} config={this.config} />;
+export function initTableComponents(configArg: Partial<Config>): TableUI {
+  const config: Required<Config> = {
+    ...{
+      tableProps: {},
+      emptyValue: DEFAULT_EMPTY_VALUE,
+    },
+    ...configArg,
   };
+  return {
+    Table: (props: Props) => {
+      return (
+        <BootstrapTable {...config.tableProps}>{props.children}</BootstrapTable>
+      );
+    },
 
-  TableHead = (props: Props) => {
-    return <TableHead {...props} config={this.config} />;
-  };
+    TableHead: (props: Props) => {
+      return <thead>{props.children}</thead>;
+    },
 
-  TableHeadRow = (props: Props) => {
-    return <TableHeadRow {...props} config={this.config} />;
-  };
+    TableHeadRow: (props: Props) => {
+      return <tr>{props.children}</tr>;
+    },
 
-  TableHeadCell = (props: Props) => {
-    return <TableHeadCell {...props} config={this.config} />;
-  };
+    TableHeadCell: (props: Props) => {
+      return <th>{props.children}</th>;
+    },
 
-  TableBody = (props: Props) => {
-    return <TableBody {...props} config={this.config} />;
-  };
+    TableBody: (props: Props) => {
+      return <tbody>{props.children}</tbody>;
+    },
 
-  TableRow = (props: Props) => {
-    return <TableRow {...props} config={this.config} />;
-  };
+    TableRow: (props: Props) => {
+      return <tr>{props.children}</tr>;
+    },
 
-  TableCell = (props: Props) => {
-    return <TableCell {...props} config={this.config} />;
-  };
-
-  DateCell = ({ value }: { value: string }) => {
-    if (!value) return this.config.emptyValue;
-    return dayjs(value).format("DD.MM.YYYY");
-  };
-
-  DateTimeCell = ({ value }: { value: string }) => {
-    if (!value) return this.config.emptyValue;
-    return dayjs(value).format("DD.MM.YYYY HH:mm");
-  };
-
-  EmptyValue = () => this.config.emptyValue;
-
-  Tooltip = ({ text, children }: TooltipProps) => {
-    return (
-      <OverlayTrigger overlay={<Tooltip> {text} </Tooltip>}>
-        <span>{children}</span>
-      </OverlayTrigger>
-    );
-  };
-
-  Link = ({ children, href }: LinkProps) => {
-    return <a href={href}> {children} </a>;
+    TableCell: (props: Props) => {
+      return <td>{props.children}</td>;
+    },
   };
 }

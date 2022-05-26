@@ -16,8 +16,8 @@ import {
   IdType,
   Renderer,
 } from "react-table";
-import { UI } from "../../ui/context";
 import { flexRender } from "../../helpers";
+import { TableUI, TableusConfig } from "../../context";
 
 type Wrapper<D extends object> = ComponentType<
   EasyCellProps<D> & { children: React.ReactNode }
@@ -26,7 +26,10 @@ type Wrapper<D extends object> = ComponentType<
 class ColumnTranslator<D extends object> {
   private idColumnAccessor?: Accessor<D>;
 
-  constructor(private columns: Column<D>[], private UI: UI) {
+  constructor(
+    private columns: Column<D>[],
+    private tableusConfig: TableusConfig
+  ) {
     this.idColumnAccessor = this.findIdColumn()?.accessor;
   }
 
@@ -93,7 +96,7 @@ class ColumnTranslator<D extends object> {
 
     const link = column.link;
     if (link !== undefined) {
-      const { Link } = this.UI;
+      const { Link } = this.tableusConfig;
       if (Link === undefined) throw new Error("Link component is not defined");
       wrapperPipe.push((props) => (
         <Link href={link(props)}>{props.children}</Link>
@@ -102,7 +105,7 @@ class ColumnTranslator<D extends object> {
 
     const tooltip = column.tooltip;
     if (tooltip !== undefined) {
-      const { Tooltip } = this.UI;
+      const { Tooltip } = this.tableusConfig;
       if (Tooltip === undefined)
         throw new Error("Tooltip component is not defined");
       wrapperPipe.push((props) => (
@@ -126,22 +129,22 @@ class ColumnTranslator<D extends object> {
   buildDefaultSingleValueCell(
     column: SingleValueColumn<D>
   ): ComponentType<EasyCellProps<D>> {
-    const { EmptyValue } = this.UI;
+    const { EmptyValue } = this.tableusConfig;
 
     switch (column.type) {
       case "date":
-        if (!this.UI.DateCell) {
+        if (!this.tableusConfig.DateCell) {
           throw new Error("DateCell is not defined");
         }
-        const DateCell = this.UI.DateCell;
+        const DateCell = this.tableusConfig.DateCell;
 
         // @ts-ignore https://stackoverflow.com/questions/72392225/reactnode-is-not-a-valid-jsx-element
         return ({ value }) => <DateCell value={value} />;
       case "datetime":
-        if (!this.UI.DatetimeCell) {
+        if (!this.tableusConfig.DatetimeCell) {
           throw new Error("DatetimeCell is not defined");
         }
-        const DateTimeCell = this.UI.DatetimeCell;
+        const DateTimeCell = this.tableusConfig.DatetimeCell;
 
         // @ts-ignore https://stackoverflow.com/questions/72392225/reactnode-is-not-a-valid-jsx-element
         return ({ value }) => <DateTimeCell value={value} />;
@@ -167,7 +170,7 @@ class ColumnTranslator<D extends object> {
 
 export function translateColumns<D extends object>(
   columns: Column<D>[],
-  UI: UI
+  tableusConfig: TableusConfig
 ) {
-  return new ColumnTranslator(columns, UI).translateColumns();
+  return new ColumnTranslator(columns, tableusConfig).translateColumns();
 }

@@ -8,10 +8,10 @@ import {
 } from "react-table";
 import { Fetcher, useFetcher } from "../fetcher/index";
 import { Props as TableusProps } from "../renderer/index";
-import { UIContext } from "../ui/context";
 import deepmerge from "deepmerge";
 import { translateColumns } from "./translator/index";
 import { Column } from "./types";
+import { TableusContext } from "../context";
 
 export interface TableConfig {
   rowSelect?: boolean;
@@ -40,19 +40,19 @@ export function useTableus<D extends object>(
   const {
     columns,
     fetcher,
-    config,
+    config: tableConfig,
     key,
     reactTableOptions: reactTableOptionsProp,
   } = options;
 
-  const uiContext = useContext(UIContext);
-  if (!uiContext?.UI) {
-    throw new Error("UI context not found");
+  const context = useContext(TableusContext);
+  const tableusConfig = context?.config;
+  if (!tableusConfig) {
+    throw new Error("Tableus config not provided");
   }
-  const { UI } = uiContext;
 
   const reactTableColumns = useMemo(
-    () => translateColumns(columns, UI),
+    () => translateColumns(columns, tableusConfig),
     [columns]
   );
 
@@ -67,12 +67,12 @@ export function useTableus<D extends object>(
     PluginHook<D>[],
     Record<any, any>[]
   ] => {
-    if (config === undefined) return [[], []];
-    const pluginConfigs = getPlugins<D>(config);
+    if (tableConfig === undefined) return [[], []];
+    const pluginConfigs = getPlugins<D>(tableConfig);
     const plugins = pluginConfigs.map((c) => c.plugin);
     const configs = pluginConfigs.map((c) => c.config);
     return [plugins, configs];
-  }, [config]);
+  }, [tableConfig]);
 
   const reactTableOptions: ReactTableOptions<D> = useMemo(() => {
     const configs: Partial<ReactTableOptions<D>>[] = [

@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { useContext } from "react";
-import { UIContext } from "../ui/context";
 import { TableInstance as ReactTableInstance } from "react-table";
+import { TableusContext } from "../context";
 
 export interface Props<D extends object> {
   reactTableInstance: ReactTableInstance<D>;
@@ -10,41 +10,42 @@ export interface Props<D extends object> {
 export function TableusRenderer<D extends object>({
   reactTableInstance,
 }: Props<D>) {
-  const uiContext = useContext(UIContext);
-  if (!uiContext?.UI) {
+  const context = useContext(TableusContext);
+  const config = context?.config;
+  if (!config?.tableUI) {
     throw new Error("No UI context provided");
   }
-  const { UI } = uiContext;
+  const { tableUI } = config;
 
   const { getTableProps, headerGroups, rows, prepareRow } = reactTableInstance;
 
   return (
-    <UI.Table {...getTableProps()}>
-      <UI.TableHead>
+    <tableUI.Table {...getTableProps()}>
+      <tableUI.TableHead>
         {headerGroups.map((headerGroup) => (
-          <UI.TableHeadRow {...headerGroup.getHeaderGroupProps()}>
+          <tableUI.TableHeadRow {...headerGroup.getHeaderGroupProps()}>
             {headerGroup.headers.map((column) => (
-              <UI.TableHeadCell {...column.getHeaderProps()}>
+              <tableUI.TableHeadCell {...column.getHeaderProps()}>
                 {column.render("Header")}
-              </UI.TableHeadCell>
+              </tableUI.TableHeadCell>
             ))}
-          </UI.TableHeadRow>
+          </tableUI.TableHeadRow>
         ))}
-      </UI.TableHead>
-      <UI.TableBody>
+      </tableUI.TableHead>
+      <tableUI.TableBody>
         {rows.map((row) => {
           prepareRow(row);
           return (
-            <UI.TableRow {...row.getRowProps()}>
+            <tableUI.TableRow {...row.getRowProps()}>
               {row.cells.map((cell) => (
-                <UI.TableCell {...cell.getCellProps()}>
+                <tableUI.TableCell {...cell.getCellProps()}>
                   {cell.render("Cell")}
-                </UI.TableCell>
+                </tableUI.TableCell>
               ))}
-            </UI.TableRow>
+            </tableUI.TableRow>
           );
         })}
-      </UI.TableBody>
-    </UI.Table>
+      </tableUI.TableBody>
+    </tableUI.Table>
   );
 }
