@@ -1,11 +1,18 @@
 import React from "react";
 import {
   OverlayTrigger,
+  Pagination as BootstrapPagination,
   Table as BootstrapTable,
   TableProps,
   Tooltip,
 } from "react-bootstrap";
-import { Props, UI } from "../ui/context";
+import {
+  LinkProps,
+  PaginationProps,
+  Props,
+  TooltipProps,
+  UI,
+} from "../ui/context";
 import dayjs from "dayjs";
 
 const DEFAULT_EMPTY_VALUE = "-";
@@ -51,14 +58,26 @@ function TableCell(props: BootstrapProps) {
   return <td>{props.children}</td>;
 }
 
-function DateCell({ date, config }: { date: string; config: Config }) {
-  if (!date) return <>{config.emptyValue}</>;
-  return <>{dayjs(date).format("DD.MM.YYYY")}</>;
-}
+function Pagination({ state }: PaginationProps) {
+  const { pageIndex } = state;
 
-function DatetimeCell({ date, config }: { date: string; config: Config }) {
-  if (!date) return <>{config.emptyValue}</>;
-  return <>{dayjs(date).format("DD.MM.YYYY HH:mm")}</>;
+  return (
+    <BootstrapPagination>
+      <BootstrapPagination.Prev />
+      <BootstrapPagination.Item>{1}</BootstrapPagination.Item>
+      <BootstrapPagination.Ellipsis />
+
+      <BootstrapPagination.Item>{10}</BootstrapPagination.Item>
+      <BootstrapPagination.Item>{11}</BootstrapPagination.Item>
+      <BootstrapPagination.Item active>{12}</BootstrapPagination.Item>
+      <BootstrapPagination.Item>{13}</BootstrapPagination.Item>
+      <BootstrapPagination.Item disabled>{14}</BootstrapPagination.Item>
+
+      <BootstrapPagination.Ellipsis />
+      <BootstrapPagination.Item>{20}</BootstrapPagination.Item>
+      <BootstrapPagination.Next />
+    </BootstrapPagination>
+  );
 }
 
 export class Bootstrap5UI implements UI {
@@ -73,98 +92,55 @@ export class Bootstrap5UI implements UI {
     };
   }
 
-  getTableComponent() {
-    return (props: Props) => {
-      return <Table {...props} config={this.config} />;
-    };
-  }
+  Table = (props: Props) => {
+    return <Table {...props} config={this.config} />;
+  };
 
-  getTableHeadComponent() {
-    return (props: Props) => {
-      return <TableHead {...props} config={this.config} />;
-    };
-  }
+  TableHead = (props: Props) => {
+    return <TableHead {...props} config={this.config} />;
+  };
 
-  getTableHeadRowComponent() {
-    return (props: Props) => {
-      return <TableHeadRow {...props} config={this.config} />;
-    };
-  }
+  TableHeadRow = (props: Props) => {
+    return <TableHeadRow {...props} config={this.config} />;
+  };
 
-  getTableHeadCellComponent() {
-    return (props: Props) => {
-      return <TableHeadCell {...props} config={this.config} />;
-    };
-  }
+  TableHeadCell = (props: Props) => {
+    return <TableHeadCell {...props} config={this.config} />;
+  };
 
-  getTableBodyComponent() {
-    return (props: Props) => {
-      return <TableBody {...props} config={this.config} />;
-    };
-  }
+  TableBody = (props: Props) => {
+    return <TableBody {...props} config={this.config} />;
+  };
 
-  getTableRowComponent() {
-    return (props: Props) => {
-      return <TableRow {...props} config={this.config} />;
-    };
-  }
+  TableRow = (props: Props) => {
+    return <TableRow {...props} config={this.config} />;
+  };
 
-  getTableCellComponent() {
-    return (props: Props) => {
-      return <TableCell {...props} config={this.config} />;
-    };
-  }
+  TableCell = (props: Props) => {
+    return <TableCell {...props} config={this.config} />;
+  };
 
-  getDateCellComponent() {
-    return ({ value }: { value: string }) => {
-      return DateCell({ date: value, config: this.config });
-    };
-  }
+  DateCell = ({ value }: { value: string }) => {
+    if (!value) return this.config.emptyValue;
+    return dayjs(value).format("DD.MM.YYYY");
+  };
 
-  getDateTimeCellComponent() {
-    return ({ value }: { value: string }) => {
-      return DatetimeCell({ date: value, config: this.config });
-    };
-  }
+  DateTimeCell = ({ value }: { value: string }) => {
+    if (!value) return this.config.emptyValue;
+    return dayjs(value).format("DD.MM.YYYY HH:mm");
+  };
 
-  getEmptyValueComponent() {
-    return () => {
-      return <>{this.config.emptyValue}</>;
-    };
-  }
+  EmptyValue = () => this.config.emptyValue;
 
-  getTooltipComponent(): React.ComponentType<{
-    children: React.ReactNode;
-    text: string;
-  }> {
-    return ({ children, text }) => (
+  Tooltip = ({ text, children }: TooltipProps) => {
+    return (
       <OverlayTrigger overlay={<Tooltip> {text} </Tooltip>}>
-        <div>{children}</div>
+        <span>{children}</span>
       </OverlayTrigger>
     );
-  }
+  };
 
-  getLinkComponent(): React.ComponentType<{
-    children: React.ReactNode;
-    href: string;
-  }> {
-    return ({ children, href }) => <a href={href}> {children} </a>;
-  }
-
-  getComponents() {
-    return {
-      Table: this.getTableComponent(),
-      TableHead: this.getTableHeadComponent(),
-      TableHeadRow: this.getTableHeadRowComponent(),
-      TableHeadCell: this.getTableHeadCellComponent(),
-      TableBody: this.getTableBodyComponent(),
-      TableRow: this.getTableRowComponent(),
-      TableCell: this.getTableCellComponent(),
-      DateCell: this.getDateCellComponent(),
-      DatetimeCell: this.getDateTimeCellComponent(),
-      EmptyValue: this.getEmptyValueComponent(),
-      TooltipComponent: this.getTooltipComponent(),
-      LinkComponent: this.getLinkComponent(),
-    };
-  }
+  Link = ({ children, href }: LinkProps) => {
+    return <a href={href}> {children} </a>;
+  };
 }

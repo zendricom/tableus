@@ -18,43 +18,33 @@ export function TableusRenderer<D extends object>({
 
   const { getTableProps, headerGroups, rows, prepareRow } = reactTableInstance;
 
-  const Table = useMemo(() => UI.getTableComponent(), [UI]);
-  const TableHead = useMemo(() => UI.getTableHeadComponent(), [UI]);
-  const TableHeadRow = useMemo(() => UI.getTableHeadRowComponent(), [UI]);
-  const TableHeadCell = useMemo(() => UI.getTableHeadCellComponent(), [UI]);
-  const TableBody = useMemo(() => UI.getTableBodyComponent(), [UI]);
-  const TableRow = useMemo(() => UI.getTableRowComponent(), [UI]);
-  const TableCell = useMemo(() => UI.getTableCellComponent(), [UI]);
-  // const TablePagination = useMemo(() => UI.getTablePaginationComponent(), [UI]);
-  // const TablePaginationActions = useMemo(() => UI.getTablePaginationActionsComponent(), [UI]);
-
   return (
-    <Table {...getTableProps()}>
-      <TableHead>
+    <UI.Table {...getTableProps()}>
+      <UI.TableHead>
         {headerGroups.map((headerGroup) => (
-          <TableHeadRow {...headerGroup.getHeaderGroupProps()}>
+          <UI.TableHeadRow {...headerGroup.getHeaderGroupProps()}>
             {headerGroup.headers.map((column) => (
-              <TableHeadCell {...column.getHeaderProps()}>
+              <UI.TableHeadCell {...column.getHeaderProps()}>
                 {column.render("Header")}
-              </TableHeadCell>
+              </UI.TableHeadCell>
             ))}
-          </TableHeadRow>
+          </UI.TableHeadRow>
         ))}
-      </TableHead>
-      <TableBody>
+      </UI.TableHead>
+      <UI.TableBody>
         {rows.map((row) => {
           prepareRow(row);
           return (
-            <TableRow {...row.getRowProps()}>
+            <UI.TableRow {...row.getRowProps()}>
               {row.cells.map((cell) => (
-                <TableCell {...cell.getCellProps()}>
+                <UI.TableCell {...cell.getCellProps()}>
                   {cell.render("Cell")}
-                </TableCell>
+                </UI.TableCell>
               ))}
-            </TableRow>
+            </UI.TableRow>
           );
         })}
-      </TableBody>
-    </Table>
+      </UI.TableBody>
+    </UI.Table>
   );
 }

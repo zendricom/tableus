@@ -1,38 +1,34 @@
-import { createContext, ReactNode } from "react";
+import { ComponentType, createContext, ReactNode } from "react";
 
 export type Props = {
   children: ReactNode;
 };
 
-type TableComponent = React.ComponentType<Props>;
+type TableComponent = ComponentType<Props>;
 
-export interface UI {
-  getTableComponent: () => TableComponent;
-  getTableHeadComponent: () => TableComponent;
-  getTableHeadRowComponent: () => TableComponent;
-  getTableHeadCellComponent: () => TableComponent;
-  getTableBodyComponent: () => TableComponent;
-  getTableRowComponent: () => TableComponent;
-  getTableCellComponent: () => TableComponent;
-  getEmptyValueComponent: () => React.ComponentType<{}>;
-
-  getDateCellComponent?: () => React.ComponentType<{ value: string }>;
-  getDatetimeCellComponent?: () => React.ComponentType<{ value: string }>;
-  getTablePaginationComponent?: () => TableComponent;
-  getTablePaginationActionsComponent?: () => TableComponent;
-  getLinkComponent?: () => React.ComponentType<{
-    children: React.ReactNode;
-    href: string;
-  }>;
-  getTooltipComponent?: () => React.ComponentType<{
-    children: React.ReactNode;
-    text: string;
-  }>;
-
-  getComponents: () => UIComponents;
+export interface PaginationProps {
+  canPreviousPage: () => boolean;
+  canNextPage: () => boolean;
+  pageCount: number;
+  gotoPage: (page: number) => void;
+  nextPage: () => void;
+  previousPage: () => void;
+  setPageSize: (pageSize: number) => void;
+  state: {
+    pageIndex: number;
+    pageSize: number;
+  };
+}
+export interface TooltipProps {
+  children: ReactNode;
+  text: string;
+}
+export interface LinkProps {
+  children: ReactNode;
+  href: string;
 }
 
-export interface UIComponents {
+export interface UI {
   Table: TableComponent;
   TableHead: TableComponent;
   TableHeadRow: TableComponent;
@@ -40,19 +36,15 @@ export interface UIComponents {
   TableBody: TableComponent;
   TableRow: TableComponent;
   TableCell: TableComponent;
-  DateCell?: React.ComponentType<{ value: string }>;
-  DatetimeCell?: React.ComponentType<{ value: string }>;
+
+  EmptyValue: () => ReactNode;
+
+  DateCell?: ({ value }: { value: string }) => ReactNode;
+  DatetimeCell?: ({ value }: { value: string }) => ReactNode;
   TablePagination?: TableComponent;
   TablePaginationActions?: TableComponent;
-  EmptyValue: React.ComponentType<{}>;
-  LinkComponent: React.ComponentType<{
-    children: React.ReactNode;
-    href: string;
-  }>;
-  TooltipComponent: React.ComponentType<{
-    children: React.ReactNode;
-    text: string;
-  }>;
+  Link?: ComponentType<LinkProps>;
+  Tooltip?: ComponentType<TooltipProps>;
 }
 
 interface Context {

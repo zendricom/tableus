@@ -8,7 +8,6 @@ import {
   isSingleValueColumn,
   MultiValueColumn,
   SingleValueColumn,
-  VisibleColumnOptions,
 } from "../types";
 import {
   CellProps,
@@ -17,7 +16,7 @@ import {
   IdType,
   Renderer,
 } from "react-table";
-import { UIComponents } from "../../ui/context";
+import { UI } from "../../ui/context";
 import { flexRender } from "../../helpers";
 
 type Wrapper<D extends object> = ComponentType<
@@ -27,10 +26,7 @@ type Wrapper<D extends object> = ComponentType<
 class ColumnTranslator<D extends object> {
   private idColumnAccessor?: Accessor<D>;
 
-  constructor(
-    private columns: Column<D>[],
-    private UIComponents: UIComponents
-  ) {
+  constructor(private columns: Column<D>[], private UI: UI) {
     this.idColumnAccessor = this.findIdColumn()?.accessor;
   }
 
@@ -91,26 +87,26 @@ class ColumnTranslator<D extends object> {
   }
 
   buildWrapper(
-    column: (SingleValueColumn<D> | MultiValueColumn<D>) &
-      VisibleColumnOptions<D>
+    column: (SingleValueColumn<D> | MultiValueColumn<D>) & ColumnOptions<D>
   ) {
     const wrapperPipe: Wrapper<D>[] = [];
 
     const link = column.link;
     if (link !== undefined) {
-      const { LinkComponent } = this.UIComponents;
+      const { Link } = this.UI;
+      if (Link === undefined) throw new Error("Link component is not defined");
       wrapperPipe.push((props) => (
-        <LinkComponent href={link(props)}>{props.children}</LinkComponent>
+        <Link href={link(props)}>{props.children}</Link>
       ));
     }
 
     const tooltip = column.tooltip;
     if (tooltip !== undefined) {
-      const { TooltipComponent } = this.UIComponents;
+      const { Tooltip } = this.UI;
+      if (Tooltip === undefined)
+        throw new Error("Tooltip component is not defined");
       wrapperPipe.push((props) => (
-        <TooltipComponent text={tooltip(props)}>
-          {props.children}
-        </TooltipComponent>
+        <Tooltip text={tooltip(props)}>{props.children}</Tooltip>
       ));
     }
 
@@ -130,24 +126,27 @@ class ColumnTranslator<D extends object> {
   buildDefaultSingleValueCell(
     column: SingleValueColumn<D>
   ): ComponentType<EasyCellProps<D>> {
-    const { EmptyValue } = this.UIComponents;
+    const { EmptyValue } = this.UI;
 
     switch (column.type) {
       case "date":
-        if (!this.UIComponents.DateCell) {
+        if (!this.UI.DateCell) {
           throw new Error("DateCell is not defined");
         }
-        const DateCell = this.UIComponents.DateCell;
+        const DateCell = this.UI.DateCell;
 
+        // @ts-ignore https://stackoverflow.com/questions/72392225/reactnode-is-not-a-valid-jsx-element
         return ({ value }) => <DateCell value={value} />;
       case "datetime":
-        if (!this.UIComponents.DatetimeCell) {
+        if (!this.UI.DatetimeCell) {
           throw new Error("DatetimeCell is not defined");
         }
-        const DateTimeCell = this.UIComponents.DatetimeCell;
+        const DateTimeCell = this.UI.DatetimeCell;
 
+        // @ts-ignore https://stackoverflow.com/questions/72392225/reactnode-is-not-a-valid-jsx-element
         return ({ value }) => <DateTimeCell value={value} />;
     }
+    // @ts-ignore https://stackoverflow.com/questions/72392225/reactnode-is-not-a-valid-jsx-element
     return ({ value }) => value || <EmptyValue />;
   }
 
@@ -168,7 +167,7 @@ class ColumnTranslator<D extends object> {
 
 export function translateColumns<D extends object>(
   columns: Column<D>[],
-  UIComponents: UIComponents
+  UI: UI
 ) {
-  return new ColumnTranslator(columns, UIComponents).translateColumns();
+  return new ColumnTranslator(columns, UI).translateColumns();
 }

@@ -1,5 +1,7 @@
 import { ReactElement, ReactFragment } from "react";
 
+// maybe react node?
+// or Return<ReactNode>
 export type ValidJSX =
   | JSX.Element
   | ReactElement
