@@ -13,24 +13,59 @@ interface Config {
   emptyValue: string;
 }
 
-function Pagination({ state }: PaginationProps) {
+function Pagination({
+  state,
+  pageCount,
+  gotoPage,
+  nextPage,
+  previousPage,
+  canNextPage,
+  canPreviousPage,
+}: PaginationProps) {
   const { pageIndex } = state;
+
+  let sliderMin = pageIndex - 2;
+  let sliderMax = pageIndex + 2;
+
+  if (sliderMin < 0) sliderMin = 0;
+  if (sliderMax > pageCount - 1) sliderMax = pageCount - 1;
+
+  const slider = [];
+  for (let i = sliderMin; i <= sliderMax; i++) {
+    slider.push(i);
+  }
 
   return (
     <BootstrapPagination>
-      <BootstrapPagination.Prev />
-      <BootstrapPagination.Item>{1}</BootstrapPagination.Item>
-      <BootstrapPagination.Ellipsis />
+      <BootstrapPagination.Prev
+        disabled={!canPreviousPage}
+        onClick={previousPage}
+      />
+      {sliderMin > 0 && (
+        <BootstrapPagination.Item onClick={() => gotoPage(0)}>
+          {1}
+        </BootstrapPagination.Item>
+      )}
+      {sliderMin > 1 && <BootstrapPagination.Ellipsis />}
 
-      <BootstrapPagination.Item>{10}</BootstrapPagination.Item>
-      <BootstrapPagination.Item>{11}</BootstrapPagination.Item>
-      <BootstrapPagination.Item active>{12}</BootstrapPagination.Item>
-      <BootstrapPagination.Item>{13}</BootstrapPagination.Item>
-      <BootstrapPagination.Item disabled>{14}</BootstrapPagination.Item>
+      {slider.map((i) => (
+        <BootstrapPagination.Item
+          active={i == pageIndex}
+          key={i}
+          onClick={() => gotoPage(i)}
+        >
+          {i + 1}
+        </BootstrapPagination.Item>
+      ))}
 
-      <BootstrapPagination.Ellipsis />
-      <BootstrapPagination.Item>{20}</BootstrapPagination.Item>
-      <BootstrapPagination.Next />
+      {sliderMax < pageCount - 2 && <BootstrapPagination.Ellipsis />}
+
+      {sliderMax < pageCount - 1 && (
+        <BootstrapPagination.Item onClick={() => gotoPage(pageCount - 1)}>
+          {pageCount}
+        </BootstrapPagination.Item>
+      )}
+      <BootstrapPagination.Next disabled={!canNextPage} onClick={nextPage} />
     </BootstrapPagination>
   );
 }
@@ -73,5 +108,7 @@ export function initTableComponents(configArg: Partial<Config>): TableUI {
     TableCell: (props: Props) => {
       return <td>{props.children}</td>;
     },
+
+    TablePagination: Pagination,
   };
 }

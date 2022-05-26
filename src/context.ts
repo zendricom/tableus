@@ -7,8 +7,8 @@ export type Props = {
 type TableComponent = ComponentType<Props>;
 
 export interface PaginationProps {
-  canPreviousPage: () => boolean;
-  canNextPage: () => boolean;
+  canPreviousPage: boolean;
+  canNextPage: boolean;
   pageCount: number;
   gotoPage: (page: number) => void;
   nextPage: () => void;
@@ -37,8 +37,7 @@ export interface TableUI {
   TableRow: TableComponent;
   TableCell: TableComponent;
 
-  TablePagination?: TableComponent;
-  TablePaginationActions?: TableComponent;
+  TablePagination?: ComponentType<PaginationProps>;
 }
 
 export interface TableusConfig {
