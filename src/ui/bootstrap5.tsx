@@ -23,6 +23,8 @@ function Pagination({
   previousPage,
   canNextPage,
   canPreviousPage,
+  paginationConfig,
+  setPageSize,
 }: PaginationProps) {
   const { pageIndex } = state;
 
@@ -38,37 +40,52 @@ function Pagination({
   }
 
   return (
-    <BootstrapPagination>
-      <BootstrapPagination.Prev
-        disabled={!canPreviousPage}
-        onClick={previousPage}
-      />
-      {sliderMin > 0 && (
-        <BootstrapPagination.Item onClick={() => gotoPage(0)}>
-          {1}
-        </BootstrapPagination.Item>
+    <div className="bs5-pagination-wrapper">
+      <BootstrapPagination>
+        <BootstrapPagination.Prev
+          disabled={!canPreviousPage}
+          onClick={previousPage}
+        />
+        {sliderMin > 0 && (
+          <BootstrapPagination.Item onClick={() => gotoPage(0)}>
+            {1}
+          </BootstrapPagination.Item>
+        )}
+        {sliderMin > 1 && <BootstrapPagination.Ellipsis />}
+
+        {slider.map((i) => (
+          <BootstrapPagination.Item
+            active={i == pageIndex}
+            key={i}
+            onClick={() => gotoPage(i)}
+          >
+            {i + 1}
+          </BootstrapPagination.Item>
+        ))}
+
+        {sliderMax < pageCount - 2 && <BootstrapPagination.Ellipsis />}
+
+        {sliderMax < pageCount - 1 && (
+          <BootstrapPagination.Item onClick={() => gotoPage(pageCount - 1)}>
+            {pageCount}
+          </BootstrapPagination.Item>
+        )}
+        <BootstrapPagination.Next disabled={!canNextPage} onClick={nextPage} />
+      </BootstrapPagination>
+      {paginationConfig?.pageSizeSelect && (
+        <BootstrapPagination className="bs5-page-size-select">
+          {paginationConfig.pageSizeSelect.map((size) => (
+            <BootstrapPagination.Item
+              active={size === state.pageSize}
+              key={size}
+              onClick={() => setPageSize(size)}
+            >
+              {size}
+            </BootstrapPagination.Item>
+          ))}
+        </BootstrapPagination>
       )}
-      {sliderMin > 1 && <BootstrapPagination.Ellipsis />}
-
-      {slider.map((i) => (
-        <BootstrapPagination.Item
-          active={i == pageIndex}
-          key={i}
-          onClick={() => gotoPage(i)}
-        >
-          {i + 1}
-        </BootstrapPagination.Item>
-      ))}
-
-      {sliderMax < pageCount - 2 && <BootstrapPagination.Ellipsis />}
-
-      {sliderMax < pageCount - 1 && (
-        <BootstrapPagination.Item onClick={() => gotoPage(pageCount - 1)}>
-          {pageCount}
-        </BootstrapPagination.Item>
-      )}
-      <BootstrapPagination.Next disabled={!canNextPage} onClick={nextPage} />
-    </BootstrapPagination>
+    </div>
   );
 }
 

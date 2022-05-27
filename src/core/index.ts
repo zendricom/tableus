@@ -14,12 +14,15 @@ import { translateColumns } from "./translator/index";
 import { Column } from "./types";
 import { TableusContext } from "../context";
 
-export interface TableConfig {
-  rowSelect?: boolean;
+export interface PaginationTableConfig {
   pagination?: boolean;
   pageSize?: 10;
   pageSizeSelect?: [10, 25, 50, 100];
 }
+
+export type TableConfig = PaginationTableConfig & {
+  rowSelect?: boolean;
+};
 
 export interface TableOptions<D extends object> {
   columns: Column<D>[];

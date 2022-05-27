@@ -1,4 +1,5 @@
 import { ComponentType, createContext, ReactNode } from "react";
+import { PaginationTableConfig } from "./core";
 import { FetcherState } from "./fetcher";
 
 export type Props = {
@@ -20,6 +21,7 @@ export interface PaginationProps {
     pageIndex: number;
     pageSize: number;
   };
+  paginationConfig: PaginationTableConfig;
 }
 export interface TooltipProps {
   children: ReactNode;

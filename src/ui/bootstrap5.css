@@ -1,3 +1,15 @@
 .bs5-filter-blur {
   filter: blur(5px);
 }
+
+.bs5-page-size-select .page-item:first-child {
+  margin-right: 0;
+}
+
+.bs5-page-size-select .page-item:last-child {
+  margin-left: 0;
+}
+.bs5-pagination-wrapper {
+  display: flex;
+  justify-content: space-between;
+}

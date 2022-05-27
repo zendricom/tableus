@@ -13,7 +13,7 @@ export class LaravelRestFetcher<D extends object> implements Fetcher<D> {
     );
     if (isPaginationTableState(tableState)) {
       url.searchParams.set("page", (tableState.pageIndex + 1).toString());
-      // TODO: add support for pageSize
+      url.searchParams.set("per_page", tableState.pageSize.toString());
     }
     const response = await fetch(url.toString());
     const data = await response.json();

@@ -96,5 +96,10 @@ function Pagination<D extends object>({
   if (!isPaginationTableInstance(reactTableInstance)) {
     throw new Error("reactTableInstance is not a PaginationTableInstance");
   }
-  return <PaginationComponent {...reactTableInstance} />;
+  return (
+    <PaginationComponent
+      {...reactTableInstance}
+      paginationConfig={tableConfig}
+    />
+  );
 }
