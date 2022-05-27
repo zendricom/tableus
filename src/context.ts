@@ -1,7 +1,9 @@
 import { ComponentType, createContext, ReactNode } from "react";
+import { FetcherState } from "./fetcher";
 
 export type Props = {
   children: ReactNode;
+  fetcherState: { isLoading: boolean; error?: unknown };
 };
 
 type TableComponent = ComponentType<Props>;

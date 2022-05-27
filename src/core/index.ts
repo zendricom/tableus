@@ -59,12 +59,13 @@ export function useTableus<D extends object>(
 
   const [tableState, setTableState] = useState<TableState<D>>();
 
-  const { data, isLoading, error, paginationMeta } = useFetcher<D>({
+  const fetcherState = useFetcher<D>({
     fetcher,
     columns,
     tableState,
     key,
   });
+  const { data, paginationMeta } = fetcherState;
 
   const [plugins, pluginConfigs] = useMemo((): [
     PluginHook<D>[],
@@ -98,7 +99,7 @@ export function useTableus<D extends object>(
   }, [reactTableInstance.state]);
 
   return {
-    tableusProps: { reactTableInstance, tableConfig },
+    tableusProps: { reactTableInstance, tableConfig, fetcherState },
     selectedRows: [],
     reactTableInstance: reactTableInstance,
   };

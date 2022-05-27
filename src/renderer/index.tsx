@@ -3,17 +3,19 @@ import { useContext } from "react";
 import { TableInstance as ReactTableInstance } from "react-table";
 import { TableUI, TableusContext } from "../context";
 import { TableConfig } from "../core";
-import { PaginationMeta } from "../fetcher";
+import { FetcherState } from "../fetcher";
 import { isPaginationTableInstance } from "../type-guards";
 
 export interface Props<D extends object> {
   reactTableInstance: ReactTableInstance<D>;
   tableConfig: TableConfig;
+  fetcherState: FetcherState<D>;
 }
 
 export function TableusRenderer<D extends object>({
   reactTableInstance,
   tableConfig,
+  fetcherState,
 }: Props<D>) {
   const context = useContext(TableusContext);
   const config = context?.config;
@@ -23,28 +25,41 @@ export function TableusRenderer<D extends object>({
   const { tableUI } = config;
 
   const { getTableProps, headerGroups, rows, prepareRow } = reactTableInstance;
+  const tableComponentsProps = { fetcherState };
 
   return (
     <>
-      <tableUI.Table {...getTableProps()}>
-        <tableUI.TableHead>
+      <tableUI.Table {...getTableProps()} {...tableComponentsProps}>
+        <tableUI.TableHead {...tableComponentsProps}>
           {headerGroups.map((headerGroup) => (
-            <tableUI.TableHeadRow {...headerGroup.getHeaderGroupProps()}>
+            <tableUI.TableHeadRow
+              {...headerGroup.getHeaderGroupProps()}
+              {...tableComponentsProps}
+            >
               {headerGroup.headers.map((column) => (
-                <tableUI.TableHeadCell {...column.getHeaderProps()}>
+                <tableUI.TableHeadCell
+                  {...column.getHeaderProps()}
+                  {...tableComponentsProps}
+                >
                   {column.render("Header")}
                 </tableUI.TableHeadCell>
               ))}
             </tableUI.TableHeadRow>
           ))}
         </tableUI.TableHead>
-        <tableUI.TableBody>
+        <tableUI.TableBody {...tableComponentsProps}>
           {rows.map((row) => {
             prepareRow(row);
             return (
-              <tableUI.TableRow {...row.getRowProps()}>
+              <tableUI.TableRow
+                {...row.getRowProps()}
+                {...tableComponentsProps}
+              >
                 {row.cells.map((cell) => (
-                  <tableUI.TableCell {...cell.getCellProps()}>
+                  <tableUI.TableCell
+                    {...cell.getCellProps()}
+                    {...tableComponentsProps}
+                  >
                     {cell.render("Cell")}
                   </tableUI.TableCell>
                 ))}

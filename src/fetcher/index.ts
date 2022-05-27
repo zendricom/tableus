@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { TableState } from "react-table";
 
@@ -34,7 +34,7 @@ interface Props<D extends object> {
   key: string;
 }
 
-interface UseFetcherReturn<D extends object> {
+export interface FetcherState<D extends object> {
   data?: D[];
   paginationMeta?: PaginationMeta;
   isLoading: boolean;
@@ -47,7 +47,7 @@ export function useFetcher<D extends object>({
   tableState,
   key,
 }: Props<D>) {
-  const [oldData, setOldData] = useState<D[]>();
+  const [oldFetchResult, setOldFetchResult] = useState<FetchResult<D>>();
   const {
     isLoading,
     error,
@@ -62,22 +62,36 @@ export function useFetcher<D extends object>({
     },
   });
 
-  const useFetcherReturn: UseFetcherReturn<D> = {
+  useEffect(() => {
+    if (fetchResult) {
+      setOldFetchResult(fetchResult);
+    }
+  }, [fetchResult]);
+
+  const { data, paginationMeta } =
+    (fetchResult && extractFetchResult(fetchResult)) ||
+    (oldFetchResult && extractFetchResult(oldFetchResult)) ||
+    {};
+
+  const fetcherState: FetcherState<D> = {
     isLoading,
     error,
+    data,
   };
 
-  if (fetchResult && "data" in fetchResult) {
-    useFetcherReturn.data = fetchResult.data;
-    useFetcherReturn.paginationMeta = fetchResult.paginationMeta;
-  } else {
-    useFetcherReturn.data = fetchResult;
+  if (paginationMeta) {
+    fetcherState.paginationMeta = paginationMeta;
   }
-  // if (useFetcherReturn.data) {
-  //   setOldData(useFetcherReturn.data);
-  // } else if (oldData) {
-  //   useFetcherReturn.data = oldData;
-  // }
 
-  return useFetcherReturn;
+  return fetcherState;
+}
+
+function extractFetchResult<D extends object>(fetchResult: FetchResult<D>) {
+  if (fetchResult && "data" in fetchResult) {
+    return {
+      data: fetchResult.data,
+      paginationMeta: fetchResult.paginationMeta,
+    };
+  }
+  return { data: fetchResult };
 }

@@ -1,3 +1,5 @@
+import "./bootstrap5.css";
+
 import React from "react";
 import {
   Pagination as BootstrapPagination,
@@ -80,8 +82,11 @@ export function initTableComponents(configArg: Partial<Config>): TableUI {
   };
   return {
     Table: (props: Props) => {
+      const className = props.fetcherState.isLoading ? "bs5-filter-blur" : "";
       return (
-        <BootstrapTable {...config.tableProps}>{props.children}</BootstrapTable>
+        <BootstrapTable {...config.tableProps} className={className}>
+          {props.children}
+        </BootstrapTable>
       );
     },
 
