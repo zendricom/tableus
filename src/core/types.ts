@@ -1,47 +1,39 @@
-import { Path } from "../helpers/types";
-import { CellProps, Column as ReactTableColumn, Renderer } from "react-table";
+import {
+  ColumnDef as ReactTableColumnDef,
+  TableInstance as ReactTableInstance,
+  Row as ReactTableRow,
+  Column as ReactTableColumn,
+  Cell as ReactTableCell,
+  PaginationState,
+} from "@tanstack/react-table";
+import { TableGenerics } from "@tanstack/react-table";
 
-export type Accessor<D> = string | Path<D>;
 export type ColumnValueType = "date" | "datetime";
 
-export interface SingleValueColumn<D extends object> {
-  accessor: Accessor<D>;
-  Header: string | (() => JSX.Element);
-  Cell?: Renderer<EasyCellProps<D>> | undefined;
+export interface AdditionalColumnDef<T extends TableGenerics> {
   type?: ColumnValueType;
-  isId?: boolean;
+  link?: (props: EasyCellProps<T["Row"]>) => string;
+  tooltip?: (props: EasyCellProps<T["Row"]>) => string;
 }
 
-export function isSingleValueColumn<D extends object>(
-  column: Column<D>
-): column is SingleValueColumn<D> {
-  return "accessor" in column && "Header" in column;
+export type ColumnDef<T extends TableGenerics> = ReactTableColumnDef<T> & {
+  meta?: AdditionalColumnDef<T>;
+};
+
+export interface CellProps<T extends TableGenerics> {
+  instance: ReactTableInstance<T>;
+  row: ReactTableRow<T>;
+  column: ReactTableColumn<T>;
+  cell: ReactTableCell<T>;
+  getValue: () => T["Value"];
 }
 
-export interface MultiValueColumn<D extends object> {
-  Cell: Renderer<EasyCellProps<D>>;
-  Header: string | (() => JSX.Element);
-  key: string;
-}
-
-export function isMultiValueColumn<D extends object>(
-  column: Column<D>
-): column is MultiValueColumn<D> {
-  return "Cell" in column && "Header" in column && "key" in column;
-}
-
-export interface ColumnOptions<D extends object> {
-  reactTableOptions?: Partial<ReactTableColumn<D>>;
-  link?: (props: EasyCellProps<D>) => string;
-  tooltip?: (props: EasyCellProps<D>) => string;
-}
-
-export type Column<D extends object> =
-  | (SingleValueColumn<D> | MultiValueColumn<D>) & ColumnOptions<D>;
-
-export interface EasyCellProps<D extends object> {
+export interface EasyCellProps<D extends Record<string, any>> {
   value: any;
   data: D;
-  cellProps: CellProps<D>;
-  id?: any;
+  cellProps: CellProps<{}>;
+}
+
+export interface TableState {
+  pagination: PaginationState;
 }

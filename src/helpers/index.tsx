@@ -1,12 +1,12 @@
+import { Renderable } from "@tanstack/react-table";
 import React, { ComponentType } from "react";
-import { CellProps, Renderer } from "react-table";
 
-export function flexRender(Comp: Renderer<any>, props: any) {
+export function flexRender(Comp: Renderable<any>, props: any) {
   return isReactComponent(Comp) ? <Comp {...props} /> : Comp;
 }
 
 function isReactComponent(
-  component: Renderer<any>
+  component: Renderable<any>
 ): component is ComponentType<any> {
   return (
     isClassComponent(component) ||
@@ -15,7 +15,7 @@ function isReactComponent(
   );
 }
 
-function isClassComponent(component: Renderer<any>) {
+function isClassComponent(component: Renderable<any>) {
   return (
     typeof component === "function" &&
     (() => {
@@ -25,7 +25,7 @@ function isClassComponent(component: Renderer<any>) {
   );
 }
 
-function isExoticComponent(component: Renderer<any>) {
+function isExoticComponent(component: Renderable<any>) {
   return (
     typeof component === "object" &&
     // @ts-ignore

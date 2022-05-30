@@ -1,21 +1,27 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import { useContext } from "react";
-import { TableInstance as ReactTableInstance } from "react-table";
-import { TableUI, TableusContext } from "../context";
+import {
+  PaginationState,
+  TableGenerics,
+  TableInstance as ReactTableInstance,
+} from "@tanstack/react-table";
+import { PaginationProps, TableUI, TableusContext } from "../context";
 import { TableConfig } from "../core";
 import { FetcherState } from "../fetcher";
-import { isPaginationTableInstance } from "../type-guards";
+import { TableState } from "../core/types";
 
-export interface Props<D extends object> {
-  reactTableInstance: ReactTableInstance<D>;
+export interface Props<T extends TableGenerics> {
+  reactTableInstance: ReactTableInstance<T>;
+  tableState: TableState;
   tableConfig: TableConfig;
-  fetcherState: FetcherState<D>;
+  fetcherState: FetcherState<T["Row"]>;
 }
 
 export function TableusRenderer<D extends object>({
   reactTableInstance,
   tableConfig,
   fetcherState,
+  tableState,
 }: Props<D>) {
   const context = useContext(TableusContext);
   const config = context?.config;
@@ -24,82 +30,73 @@ export function TableusRenderer<D extends object>({
   }
   const { tableUI } = config;
 
-  const { getTableProps, headerGroups, rows, prepareRow } = reactTableInstance;
   const tableComponentsProps = { fetcherState };
 
   return (
     <>
-      <tableUI.Table {...getTableProps()} {...tableComponentsProps}>
+      <tableUI.Table {...tableComponentsProps}>
         <tableUI.TableHead {...tableComponentsProps}>
-          {headerGroups.map((headerGroup) => (
+          {reactTableInstance.getHeaderGroups().map((headerGroup) => (
             <tableUI.TableHeadRow
-              {...headerGroup.getHeaderGroupProps()}
+              key={headerGroup.id}
               {...tableComponentsProps}
             >
-              {headerGroup.headers.map((column) => (
+              {headerGroup.headers.map((header) => (
                 <tableUI.TableHeadCell
-                  {...column.getHeaderProps()}
+                  key={header.id}
                   {...tableComponentsProps}
                 >
-                  {column.render("Header")}
+                  {header.isPlaceholder
+                    ? null
+                    : (header.renderHeader() as ReactNode)}
                 </tableUI.TableHeadCell>
               ))}
             </tableUI.TableHeadRow>
           ))}
         </tableUI.TableHead>
         <tableUI.TableBody {...tableComponentsProps}>
-          {rows.map((row) => {
-            prepareRow(row);
-            return (
-              <tableUI.TableRow
-                {...row.getRowProps()}
-                {...tableComponentsProps}
-              >
-                {row.cells.map((cell) => (
-                  <tableUI.TableCell
-                    {...cell.getCellProps()}
-                    {...tableComponentsProps}
-                  >
-                    {cell.render("Cell")}
-                  </tableUI.TableCell>
-                ))}
-              </tableUI.TableRow>
-            );
-          })}
+          {reactTableInstance.getRowModel().rows.map((row) => (
+            <tableUI.TableRow key={row.id} {...tableComponentsProps}>
+              {row.getVisibleCells().map((cell) => (
+                <tableUI.TableCell key={cell.id} {...tableComponentsProps}>
+                  {cell.renderCell() as ReactNode}
+                </tableUI.TableCell>
+              ))}
+            </tableUI.TableRow>
+          ))}
         </tableUI.TableBody>
       </tableUI.Table>
-      <Pagination<D>
-        tableConfig={tableConfig}
-        tableUI={tableUI}
-        reactTableInstance={reactTableInstance}
-      />
+      {tableConfig.pagination && (
+        <Pagination<D>
+          reactTableInstance={reactTableInstance}
+          paginationState={tableState.pagination}
+          tableUI={tableUI}
+          tableConfig={tableConfig}
+        />
+      )}
     </>
   );
 }
 
-function Pagination<D extends object>({
-  tableConfig,
-  tableUI,
+function Pagination<T extends TableGenerics>({
+  paginationState,
   reactTableInstance,
+  tableUI,
+  tableConfig,
 }: {
-  reactTableInstance: ReactTableInstance<D>;
-  tableConfig: TableConfig;
+  paginationState: PaginationState;
+  reactTableInstance: ReactTableInstance<T>;
   tableUI: TableUI;
+  tableConfig: TableConfig;
 }) {
-  if (!tableConfig.pagination) {
-    return null;
-  }
   const PaginationComponent = tableUI.TablePagination;
   if (PaginationComponent === undefined) {
     throw new Error("No Pagination component provided");
   }
-  if (!isPaginationTableInstance(reactTableInstance)) {
-    throw new Error("reactTableInstance is not a PaginationTableInstance");
-  }
-  return (
-    <PaginationComponent
-      {...reactTableInstance}
-      paginationConfig={tableConfig}
-    />
-  );
+  const props: PaginationProps = {
+    paginationMethods: reactTableInstance,
+    paginationState,
+    paginationConfig: tableConfig,
+  };
+  return <PaginationComponent {...props} />;
 }

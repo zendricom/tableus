@@ -16,17 +16,18 @@ interface Config {
 }
 
 function Pagination({
-  state,
-  pageCount,
-  gotoPage,
-  nextPage,
-  previousPage,
-  canNextPage,
-  canPreviousPage,
+  paginationMethods: {
+    getCanPreviousPage,
+    getCanNextPage,
+    nextPage,
+    previousPage,
+    setPageIndex,
+    setPageSize,
+  },
+  paginationState: { pageIndex, pageCount, pageSize },
   paginationConfig,
-  setPageSize,
 }: PaginationProps) {
-  const { pageIndex } = state;
+  if (pageCount === undefined) return null;
 
   let sliderMin = pageIndex - 2;
   let sliderMax = pageIndex + 2;
@@ -43,11 +44,11 @@ function Pagination({
     <div className="bs5-pagination-wrapper">
       <BootstrapPagination>
         <BootstrapPagination.Prev
-          disabled={!canPreviousPage}
+          disabled={!getCanPreviousPage()}
           onClick={previousPage}
         />
         {sliderMin > 0 && (
-          <BootstrapPagination.Item onClick={() => gotoPage(0)}>
+          <BootstrapPagination.Item onClick={() => setPageIndex(0)}>
             {1}
           </BootstrapPagination.Item>
         )}
@@ -57,7 +58,7 @@ function Pagination({
           <BootstrapPagination.Item
             active={i == pageIndex}
             key={i}
-            onClick={() => gotoPage(i)}
+            onClick={() => setPageIndex(i)}
           >
             {i + 1}
           </BootstrapPagination.Item>
@@ -66,17 +67,20 @@ function Pagination({
         {sliderMax < pageCount - 2 && <BootstrapPagination.Ellipsis />}
 
         {sliderMax < pageCount - 1 && (
-          <BootstrapPagination.Item onClick={() => gotoPage(pageCount - 1)}>
+          <BootstrapPagination.Item onClick={() => setPageIndex(pageCount - 1)}>
             {pageCount}
           </BootstrapPagination.Item>
         )}
-        <BootstrapPagination.Next disabled={!canNextPage} onClick={nextPage} />
+        <BootstrapPagination.Next
+          disabled={!getCanNextPage()}
+          onClick={nextPage}
+        />
       </BootstrapPagination>
       {paginationConfig?.pageSizeSelect && (
         <BootstrapPagination className="bs5-page-size-select">
           {paginationConfig.pageSizeSelect.map((size) => (
             <BootstrapPagination.Item
-              active={size === state.pageSize}
+              active={size === pageSize}
               key={size}
               onClick={() => setPageSize(size)}
             >

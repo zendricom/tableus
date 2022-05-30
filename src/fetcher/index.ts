@@ -1,42 +1,36 @@
+import { PaginationState } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
-import { TableState } from "react-table";
 
-import { Column } from "../core/types";
+import { ColumnDef, TableState } from "../core/types";
 
-export interface FetchArgs<D extends object> {
-  tableState?: TableState<D>;
-  columns: Column<D>[];
+export interface FetchArgs<D extends Record<string, any>> {
+  tableState?: TableState;
+  columns: ColumnDef<D>[];
   // customFilters
 }
 
-export interface PaginationMeta {
-  pageIndex: number;
-  pageSize: number;
-  pageCount: number;
-}
-
-export type FetchResult<D extends object> =
+export type FetchResult<D extends Record<string, any>> =
   | D[]
   | {
       data: D[];
-      paginationMeta: PaginationMeta;
+      paginationState: PaginationState;
     };
 
-export interface Fetcher<D extends object> {
+export interface Fetcher<D extends Record<string, any>> {
   fetch(fetchArgs: FetchArgs<D>): Promise<FetchResult<D>>;
 }
 
 interface Props<D extends object> {
   fetcher: Fetcher<D>;
-  columns: Column<D>[];
-  tableState?: TableState<D>;
+  columns: ColumnDef<D>[];
+  tableState?: TableState;
   key: string;
 }
 
-export interface FetcherState<D extends object> {
+export interface FetcherState<D extends Record<string, any>> {
   data?: D[];
-  paginationMeta?: PaginationMeta;
+  paginationState?: PaginationState;
   isLoading: boolean;
   error?: unknown;
 }
@@ -57,7 +51,7 @@ export function useFetcher<D extends object>({
     queryFn: () => {
       return fetcher.fetch({
         columns,
-        tableState: tableState,
+        tableState,
       });
     },
   });
@@ -68,7 +62,7 @@ export function useFetcher<D extends object>({
     }
   }, [fetchResult]);
 
-  const { data, paginationMeta } =
+  const { data, paginationState } =
     (fetchResult && extractFetchResult(fetchResult)) ||
     (oldFetchResult && extractFetchResult(oldFetchResult)) ||
     {};
@@ -79,8 +73,8 @@ export function useFetcher<D extends object>({
     data,
   };
 
-  if (paginationMeta) {
-    fetcherState.paginationMeta = paginationMeta;
+  if (paginationState) {
+    fetcherState.paginationState = paginationState;
   }
 
   return fetcherState;
@@ -90,7 +84,7 @@ function extractFetchResult<D extends object>(fetchResult: FetchResult<D>) {
   if (fetchResult && "data" in fetchResult) {
     return {
       data: fetchResult.data,
-      paginationMeta: fetchResult.paginationMeta,
+      paginationState: fetchResult.paginationState,
     };
   }
   return { data: fetchResult };

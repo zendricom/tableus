@@ -1,6 +1,9 @@
+import {
+  PaginationInstance as ReactTablePaginationInstance,
+  PaginationState,
+} from "@tanstack/react-table";
 import { ComponentType, createContext, ReactNode } from "react";
 import { PaginationTableConfig } from "./core";
-import { FetcherState } from "./fetcher";
 
 export type Props = {
   children: ReactNode;
@@ -10,18 +13,15 @@ export type Props = {
 type TableComponent = ComponentType<Props>;
 
 export interface PaginationProps {
-  canPreviousPage: boolean;
-  canNextPage: boolean;
-  pageCount: number;
-  gotoPage: (page: number) => void;
-  nextPage: () => void;
-  previousPage: () => void;
-  setPageSize: (pageSize: number) => void;
-  state: {
-    pageIndex: number;
-    pageSize: number;
-  };
   paginationConfig: PaginationTableConfig;
+  paginationMethods: Omit<
+    ReactTablePaginationInstance<{}>,
+    | "getPrePaginationRowModel"
+    | "getPaginationRowModel"
+    | "_getPaginationRowModel"
+    | "_autoResetPageIndex"
+  >;
+  paginationState: PaginationState;
 }
 export interface TooltipProps {
   children: ReactNode;

@@ -1,19 +1,25 @@
-import { isPaginationTableState } from "../type-guards";
-import { FetchArgs, Fetcher, FetchResult, PaginationMeta } from "./index";
+import { PaginationState } from "@tanstack/react-table";
+import { FetchArgs, Fetcher, FetchResult } from "./index";
 
 export class LaravelRestFetcher<D extends object> implements Fetcher<D> {
   constructor(private readonly url: string) {}
 
   async fetch({ tableState, columns }: FetchArgs<D>): Promise<FetchResult<D>> {
-    if (!tableState) return [];
+    if (!tableState?.pagination) return [];
     const url = new URL(
       isAbsoluteUrl(this.url)
         ? this.url
         : `${window.location.origin}${this.url}`
     );
-    if (isPaginationTableState(tableState)) {
-      url.searchParams.set("page", (tableState.pageIndex + 1).toString());
-      url.searchParams.set("per_page", tableState.pageSize.toString());
+    if (tableState) {
+      url.searchParams.set(
+        "page",
+        (tableState.pagination.pageIndex + 1).toString()
+      );
+      url.searchParams.set(
+        "per_page",
+        tableState.pagination.pageSize.toString()
+      );
     }
     const response = await fetch(url.toString());
     const data = await response.json();
@@ -30,7 +36,7 @@ export class LaravelRestFetcher<D extends object> implements Fetcher<D> {
     ) {
       return {
         data: data.data,
-        paginationMeta: transformLaravelMeta(data.meta),
+        paginationState: transformLaravelMeta(data.meta),
       };
     }
 
@@ -62,7 +68,7 @@ function isLaravelMeta(meta: object): meta is LaravelMeta {
   );
 }
 
-function transformLaravelMeta(meta: LaravelMeta): PaginationMeta {
+function transformLaravelMeta(meta: LaravelMeta): PaginationState {
   return {
     pageIndex: meta.current_page - 1,
     pageSize: meta.per_page,

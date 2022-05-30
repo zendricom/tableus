@@ -1,100 +1,68 @@
 import React, { ComponentType } from "react";
-import {
-  Accessor,
-  Column,
-  ColumnOptions,
-  EasyCellProps,
-  isMultiValueColumn,
-  isSingleValueColumn,
-  MultiValueColumn,
-  SingleValueColumn,
-} from "../types";
-import {
-  CellProps,
-  Column as ReactTableColumn,
-  ColumnWithLooseAccessor,
-  IdType,
-  Renderer,
-} from "react-table";
 import { flexRender } from "../../helpers";
 import { TableUI, TableusConfig } from "../../context";
+import { CellProps, ColumnDef, EasyCellProps } from "../types";
+import {
+  ColumnDef as ReactTableColumnDef,
+  Renderable,
+  TableGenerics,
+} from "@tanstack/react-table";
 
-type Wrapper<D extends object> = ComponentType<
+type Wrapper<D extends Record<string, any>> = ComponentType<
   EasyCellProps<D> & { children: React.ReactNode }
 >;
 
-class ColumnTranslator<D extends object> {
-  private idColumnAccessor?: Accessor<D>;
+class ColumnTranslator<T extends TableGenerics> {
+  // private idColumnAccessor?: Accessor<T>;
 
   constructor(
-    private columns: Column<D>[],
+    private columns: ColumnDef<T>[],
     private tableusConfig: TableusConfig
   ) {
-    this.idColumnAccessor = this.findIdColumn()?.accessor;
+    // this.idColumnAccessor = this.findIdColumn()?.accessor;
   }
 
-  translateColumns(): ReactTableColumn<D>[] {
+  translateColumns(): ReactTableColumnDef<T>[] {
     return this.columns.map((column) => {
-      if (isSingleValueColumn(column)) {
-        return this.translateSingleValueColumn(column);
-      } else if (isMultiValueColumn(column)) {
-        return this.translateMultiValueColumn(column);
-      }
-      throw new Error("Unknown column type");
-    }) as ReactTableColumn<D>[]; // temorary fix
+      return this.translateColumnDef(column);
+      // }) as ReactTableColumn<T>[]; // temorary fix
+    }); // temorary fix
   }
 
-  findIdColumn(): SingleValueColumn<D> | undefined {
-    return this.columns.find((column) => "isId" in column && column.isId) as
-      | SingleValueColumn<D>
-      | undefined;
-  }
+  // findIdColumn(): SingleValueColumn<T> | undefined {
+  //   return this.columns.find((column) => "isId" in column && column.isId) as
+  //     | SingleValueColumn<T>
+  //     | undefined;
+  // }
 
-  translateSingleValueColumn(column: SingleValueColumn<D> & ColumnOptions<D>) {
-    const reactTableColumn: ColumnWithLooseAccessor<D> = {
-      Header: column.Header,
-      // @ts-ignore
-      accessor: column.accessor,
-      ...column.reactTableOptions,
-    };
-
-    reactTableColumn.Cell = this.buildCell(
-      column,
-      column.Cell || this.buildDefaultSingleValueCell(column)
-    );
-
-    return reactTableColumn;
-  }
-
-  translateMultiValueColumn(column: MultiValueColumn<D> & ColumnOptions<D>) {
+  translateColumnDef(column: ColumnDef<T>) {
     const reactTableColumn = {
-      Header: column.Header,
-      id: column.key,
-      Cell: this.buildCell(column, column.Cell),
-      ...column.reactTableOptions,
+      ...column,
     };
 
+    reactTableColumn.cell = this.buildCell(
+      column,
+      column.cell || this.buildDefaultCell(column)
+    ) as any;
     return reactTableColumn;
   }
 
   buildCell(
-    column: SingleValueColumn<D> | MultiValueColumn<D>,
-    Cell: Renderer<EasyCellProps<D>>
-  ): Renderer<CellProps<D>> {
+    column: ColumnDef<T>,
+    Cell: Renderable<CellProps<T>>
+  ): Renderable<CellProps<T>> {
     const wrapper = this.buildWrapper(column);
 
-    return ((props: CellProps<D>) => {
+    return (props: CellProps<T>) => {
       const easyCellProps = this.makeEasyCellProps(props);
       return wrapper(easyCellProps, Cell);
-    }) as Renderer<CellProps<D>>;
+    };
   }
 
-  buildWrapper(
-    column: (SingleValueColumn<D> | MultiValueColumn<D>) & ColumnOptions<D>
-  ) {
-    const wrapperPipe: Wrapper<D>[] = [];
+  buildWrapper(column: ColumnDef<T>) {
+    const wrapperPipe: Wrapper<T>[] = [];
 
-    const link = column.link;
+    const link = column.meta?.link;
     if (link !== undefined) {
       const { Link } = this.tableusConfig;
       if (Link === undefined) throw new Error("Link component is not defined");
@@ -103,7 +71,7 @@ class ColumnTranslator<D extends object> {
       ));
     }
 
-    const tooltip = column.tooltip;
+    const tooltip = column.meta?.tooltip;
     if (tooltip !== undefined) {
       const { Tooltip } = this.tableusConfig;
       if (Tooltip === undefined)
@@ -116,8 +84,11 @@ class ColumnTranslator<D extends object> {
     return this.buildWrapperFromPipe(wrapperPipe);
   }
 
-  buildWrapperFromPipe(wrapperPipe: Wrapper<D>[]) {
-    return (props: EasyCellProps<D>, renderer: Renderer<EasyCellProps<D>>) => {
+  buildWrapperFromPipe(wrapperPipe: Wrapper<T>[]) {
+    return (
+      props: EasyCellProps<T>,
+      renderer: Renderable<EasyCellProps<T>>
+    ) => {
       return wrapperPipe.reduce(
         // (prev, Wrapper) => React.createElement(Wrapper, props, prev),
         (prev, Wrapper) => <Wrapper {...props}>{prev}</Wrapper>,
@@ -126,12 +97,10 @@ class ColumnTranslator<D extends object> {
     };
   }
 
-  buildDefaultSingleValueCell(
-    column: SingleValueColumn<D>
-  ): ComponentType<EasyCellProps<D>> {
+  buildDefaultCell(column: ColumnDef<T>): ComponentType<EasyCellProps<T>> {
     const { EmptyValue } = this.tableusConfig;
 
-    switch (column.type) {
+    switch (column.meta?.type) {
       case "date":
         if (!this.tableusConfig.DateCell) {
           throw new Error("DateCell is not defined");
@@ -153,23 +122,23 @@ class ColumnTranslator<D extends object> {
     return ({ value }) => value || <EmptyValue />;
   }
 
-  makeEasyCellProps(props: CellProps<D>) {
-    const { value } = props;
+  makeEasyCellProps(props: CellProps<T>) {
+    const { getValue } = props;
     const data = props.row.original;
-    const easyCellProps: EasyCellProps<D> = {
-      value,
+    const easyCellProps: EasyCellProps<T["Row"]> = {
+      value: getValue(),
       data,
-      cellProps: props,
+      cellProps: props as any,
     };
-    if (this.idColumnAccessor) {
-      easyCellProps.id = props.row.values[this.idColumnAccessor as IdType<D>];
-    }
+    // if (this.idColumnAccessor) {
+    //   easyCellProps.id = props.row.values[this.idColumnAccessor as IdType<T>];
+    // }
     return easyCellProps;
   }
 }
 
-export function translateColumns<D extends object>(
-  columns: Column<D>[],
+export function translateColumns<T extends TableGenerics>(
+  columns: ColumnDef<T>[],
   tableusConfig: TableusConfig
 ) {
   return new ColumnTranslator(columns, tableusConfig).translateColumns();
