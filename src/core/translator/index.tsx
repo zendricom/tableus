@@ -92,7 +92,7 @@ class ColumnTranslator<T extends TableGenerics> {
       return wrapperPipe.reduce(
         // (prev, Wrapper) => React.createElement(Wrapper, props, prev),
         (prev, Wrapper) => <Wrapper {...props}>{prev}</Wrapper>,
-        flexRender(renderer, props)
+        flexRender(renderer, props.cellProps || props)
       );
     };
   }
@@ -108,7 +108,7 @@ class ColumnTranslator<T extends TableGenerics> {
         const DateCell = this.tableusConfig.DateCell;
 
         // @ts-ignore https://stackoverflow.com/questions/72392225/reactnode-is-not-a-valid-jsx-element
-        return ({ value }) => <DateCell value={value} />;
+        return (props) => <DateCell {...props} />;
       case "datetime":
         if (!this.tableusConfig.DatetimeCell) {
           throw new Error("DatetimeCell is not defined");
@@ -116,10 +116,10 @@ class ColumnTranslator<T extends TableGenerics> {
         const DateTimeCell = this.tableusConfig.DatetimeCell;
 
         // @ts-ignore https://stackoverflow.com/questions/72392225/reactnode-is-not-a-valid-jsx-element
-        return ({ value }) => <DateTimeCell value={value} />;
+        return (props) => <DateTimeCell {...props} />;
     }
     // @ts-ignore https://stackoverflow.com/questions/72392225/reactnode-is-not-a-valid-jsx-element
-    return ({ value }) => value || <EmptyValue />;
+    return (props) => props.getValue() || <EmptyValue />;
   }
 
   makeEasyCellProps(props: CellProps<T>) {

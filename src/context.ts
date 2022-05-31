@@ -4,6 +4,7 @@ import {
 } from "@tanstack/react-table";
 import { ComponentType, createContext, ReactNode } from "react";
 import { PaginationTableConfig } from "./core";
+import { CellProps } from "./core/types";
 
 export type Props = {
   children: ReactNode;
@@ -49,8 +50,8 @@ export interface TableusConfig {
 
   EmptyValue: () => ReactNode;
 
-  DateCell?: ({ value }: { value: string }) => ReactNode;
-  DatetimeCell?: ({ value }: { value: string }) => ReactNode;
+  DateCell?: (props: CellProps<{}>) => ReactNode;
+  DatetimeCell?: (props: CellProps<{}>) => ReactNode;
 
   Link?: ComponentType<LinkProps>;
   Tooltip?: ComponentType<TooltipProps>;

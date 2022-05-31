@@ -63,19 +63,16 @@ export function useFetcher<D extends object>({
   }, [fetchResult]);
 
   const { data, paginationState } =
-    (fetchResult && extractFetchResult(fetchResult)) ||
-    (oldFetchResult && extractFetchResult(oldFetchResult)) ||
-    {};
+    (fetchResult && extractFetchResult(fetchResult)) || {};
+  const { data: oldData } =
+    (oldFetchResult && extractFetchResult(oldFetchResult)) || {};
 
   const fetcherState: FetcherState<D> = {
     isLoading,
     error,
-    data,
+    data: data || oldData,
+    paginationState,
   };
-
-  if (paginationState) {
-    fetcherState.paginationState = paginationState;
-  }
 
   return fetcherState;
 }

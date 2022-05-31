@@ -1,6 +1,6 @@
 import {
   createTable as createReactTable,
-  Overwrite,
+  getCoreRowModel,
   PaginationState,
   ReactTableGenerics,
   Render,
@@ -42,20 +42,9 @@ export interface TableStateInstance<T extends ReactTableGenerics> {
   reactTableInstance: ReactTableInstance<T>;
 }
 
-type GenerateTableGenerics<D extends Record<string, any>> = {
-  Renderer: Render;
-  Rendered: React.ReactNode | JSX.Element;
-  Row: D;
-};
-
-function createAndSetTable<D extends Record<string, any>>() {
+export function createTable<D extends Record<string, any>>() {
   const table = createReactTable().setRowType<D>();
   return table.setColumnMetaType<AdditionalColumnDef<typeof table.generics>>();
-}
-
-export function createTable<D extends Record<string, any>>() {
-  const { current: table } = useRef(createAndSetTable<D>());
-  return table;
 }
 
 export function useTableus<T extends ReactTableGenerics>(
@@ -96,7 +85,7 @@ export function useTableus<T extends ReactTableGenerics>(
   });
   const { data, paginationState } = fetcherState;
   useEffect(() => {
-    if (paginationState) {
+    if (paginationState !== undefined) {
       setPagination(paginationState);
     }
   }, [paginationState]);
@@ -118,6 +107,10 @@ export function useTableus<T extends ReactTableGenerics>(
       {
         data: data ?? [],
         columns: reactTableColumns,
+        state: { pagination },
+        onPaginationChange: setPagination,
+        getCoreRowModel: getCoreRowModel(),
+
       },
       // ...pluginConfigs,
     ];
@@ -131,11 +124,7 @@ export function useTableus<T extends ReactTableGenerics>(
 
   const reactTableInstance = useTableInstance(
     table,
-    {
-      state: { pagination },
-      onPaginationChange: setPagination,
-      ...reactTableOptions,
-    }
+    reactTableOptions
     // ...plugins
   );
   // const [tableState, setTableState] = useState<ReactTableState>(
