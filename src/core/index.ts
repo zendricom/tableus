@@ -111,6 +111,8 @@ export function useTableus<T extends ReactTableGenerics>(
         onPaginationChange: setPagination,
         getCoreRowModel: getCoreRowModel(),
 
+        // consider autoResetAll as this already caused a hard to debug bug
+        autoResetPageIndex: false,
       },
       // ...pluginConfigs,
     ];
