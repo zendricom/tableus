@@ -9,7 +9,7 @@ import {
   UseTableInstanceOptions,
 } from "@tanstack/react-table";
 import deepmerge from "deepmerge";
-import { useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 
 import { TableusContext } from "../context";
 import { Fetcher, useFetcher } from "../fetcher/index";
@@ -20,8 +20,8 @@ import { AdditionalColumnDef, ColumnDef } from "./types";
 
 export interface PaginationTableConfig {
   pagination?: boolean;
-  pageSize?: 10;
-  pageSizeSelect?: [10, 25, 50, 100];
+  pageSize?: number;
+  pageSizeSelect?: number[];
 }
 
 export type TableConfig = PaginationTableConfig & { rowSelect?: boolean };
@@ -67,10 +67,11 @@ export function useTableus<T extends ReactTableGenerics>(
     () => translateColumns(columns, tableusConfig),
     [columns]
   );
+
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
-    pageSize: 10,
-    pageCount: 200,
+    pageSize: options.config?.pageSize ?? 20,
+    pageCount: -1,
   });
 
   const fetcherState = useFetcher<T["Row"]>({
