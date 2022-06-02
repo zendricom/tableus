@@ -120,23 +120,32 @@ export function initTableComponents(configArg: Partial<Config>): TableUI {
       return <tr>{props.children}</tr>;
     },
 
-    TableHeadCell: (props: HeaderProps) => {
-      const { getCanSort, getToggleSortingHandler, getIsSorted } = props;
-
-      const canSort = getCanSort();
+    TableHeadCell: ({
+      getCanSort,
+      getToggleSortingHandler,
+      getIsSorted,
+      tableConfig,
+      children,
+    }: HeaderProps) => {
+      const canSort = tableConfig.sorting === true && getCanSort();
 
       let sortIcon = null;
       if (canSort && getIsSorted()) {
-        sortIcon = getIsSorted() === "asc" ? <SortUp /> : <SortDown />;
+        sortIcon =
+          getIsSorted() === "asc" ? (
+            <SortUp size={16} />
+          ) : (
+            <SortDown size={16} />
+          );
       }
 
+      const thProps = canSort
+        ? { role: "button", onClick: getToggleSortingHandler() }
+        : {};
       return (
-        <th>
-          <div
-            onClick={getToggleSortingHandler()}
-            className="d-flex justify-content-between"
-          >
-            {props.children}
+        <th {...thProps}>
+          <div className="d-flex justify-content-between align-items-center">
+            {children}
             {sortIcon}
           </div>
         </th>

@@ -30,7 +30,7 @@ export function TableusRenderer<D extends object>({
   }
   const { tableUI } = config;
 
-  const tableComponentsProps = { fetcherState };
+  const tableComponentsProps = { fetcherState, tableConfig };
 
   return (
     <>

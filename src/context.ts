@@ -4,12 +4,13 @@ import {
   SortDirection,
 } from "@tanstack/react-table";
 import { ComponentType, createContext, ReactNode } from "react";
-import { PaginationTableConfig } from "./core";
+import { PaginationTableConfig, TableConfig } from "./core";
 import { CellProps } from "./core/types";
 
 export type Props = {
   children: ReactNode;
   fetcherState: { isLoading: boolean; error?: unknown };
+  tableConfig: TableConfig;
 };
 
 export type HeaderProps = Props & {

@@ -25,7 +25,10 @@ export interface PaginationTableConfig {
   pageSizeSelect?: number[];
 }
 
-export type TableConfig = PaginationTableConfig & { rowSelect?: boolean };
+export type TableConfig = PaginationTableConfig & {
+  sorting?: boolean;
+  rowSelect?: boolean;
+};
 
 export interface TableOptions<T extends ReactTableGenerics> {
   columns: ColumnDef<T>[];
