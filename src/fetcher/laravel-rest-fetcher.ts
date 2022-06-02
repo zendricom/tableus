@@ -1,4 +1,4 @@
-import { PaginationState } from "@tanstack/react-table";
+import { PaginationState, SortingState } from "@tanstack/react-table";
 import { FetchArgs, Fetcher, FetchResult } from "./index";
 
 export class LaravelRestFetcher<D extends object> implements Fetcher<D> {
@@ -11,16 +11,12 @@ export class LaravelRestFetcher<D extends object> implements Fetcher<D> {
         ? this.url
         : `${window.location.origin}${this.url}`
     );
-    if (tableState) {
-      url.searchParams.set(
-        "page",
-        (tableState.pagination.pageIndex + 1).toString()
-      );
-      url.searchParams.set(
-        "per_page",
-        tableState.pagination.pageSize.toString()
-      );
+    const { pagination, sorting } = tableState;
+    if (sorting) {
+      setPaginationQueryParams(url, pagination);
+      setSortingQueryParams(url, sorting);
     }
+
     const response = await fetch(url.toString());
     const data = await response.json();
 
@@ -42,6 +38,17 @@ export class LaravelRestFetcher<D extends object> implements Fetcher<D> {
 
     return data.data;
   }
+}
+
+function setPaginationQueryParams(url: URL, paginationState: PaginationState) {
+  url.searchParams.set("page", (paginationState.pageIndex + 1).toString());
+  url.searchParams.set("per_page", paginationState.pageSize.toString());
+}
+function setSortingQueryParams(url: URL, sorting: SortingState) {
+  const sortingString = sorting
+    .map((sort) => (sort.desc ? "-" : "") + sort.id)
+    .join(",");
+  url.searchParams.set("sort", sortingString);
 }
 
 function isAbsoluteUrl(url: string): boolean {

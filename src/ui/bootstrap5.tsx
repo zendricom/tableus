@@ -1,12 +1,13 @@
 import "./bootstrap5.css";
 
 import React from "react";
+import { SortUp, SortDown } from "react-bootstrap-icons";
 import {
   Pagination as BootstrapPagination,
   Table as BootstrapTable,
   TableProps,
 } from "react-bootstrap";
-import { PaginationProps, Props, TableUI } from "../context";
+import { HeaderProps, PaginationProps, Props, TableUI } from "../context";
 
 const DEFAULT_EMPTY_VALUE = "-";
 
@@ -119,8 +120,27 @@ export function initTableComponents(configArg: Partial<Config>): TableUI {
       return <tr>{props.children}</tr>;
     },
 
-    TableHeadCell: (props: Props) => {
-      return <th>{props.children}</th>;
+    TableHeadCell: (props: HeaderProps) => {
+      const { getCanSort, getToggleSortingHandler, getIsSorted } = props;
+
+      const canSort = getCanSort();
+
+      let sortIcon = null;
+      if (canSort && getIsSorted()) {
+        sortIcon = getIsSorted() === "asc" ? <SortUp /> : <SortDown />;
+      }
+
+      return (
+        <th>
+          <div
+            onClick={getToggleSortingHandler()}
+            className="d-flex justify-content-between"
+          >
+            {props.children}
+            {sortIcon}
+          </div>
+        </th>
+      );
     },
 
     TableBody: (props: Props) => {

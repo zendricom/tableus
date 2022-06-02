@@ -41,16 +41,23 @@ export function TableusRenderer<D extends object>({
               key={headerGroup.id}
               {...tableComponentsProps}
             >
-              {headerGroup.headers.map((header) => (
-                <tableUI.TableHeadCell
-                  key={header.id}
-                  {...tableComponentsProps}
-                >
-                  {header.isPlaceholder
-                    ? null
-                    : (header.renderHeader() as ReactNode)}
-                </tableUI.TableHeadCell>
-              ))}
+              {headerGroup.headers.map((header) => {
+                return (
+                  <tableUI.TableHeadCell
+                    key={header.id}
+                    getToggleSortingHandler={
+                      header.column.getToggleSortingHandler
+                    }
+                    getIsSorted={header.column.getIsSorted}
+                    getCanSort={header.column.getCanSort}
+                    {...tableComponentsProps}
+                  >
+                    {header.isPlaceholder
+                      ? null
+                      : (header.renderHeader() as ReactNode)}
+                  </tableUI.TableHeadCell>
+                );
+              })}
             </tableUI.TableHeadRow>
           ))}
         </tableUI.TableHead>

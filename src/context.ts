@@ -1,6 +1,7 @@
 import {
   PaginationInstance as ReactTablePaginationInstance,
   PaginationState,
+  SortDirection,
 } from "@tanstack/react-table";
 import { ComponentType, createContext, ReactNode } from "react";
 import { PaginationTableConfig } from "./core";
@@ -11,7 +12,14 @@ export type Props = {
   fetcherState: { isLoading: boolean; error?: unknown };
 };
 
+export type HeaderProps = Props & {
+  getToggleSortingHandler: () => ((event: unknown) => void) | undefined;
+  getIsSorted: () => false | SortDirection;
+  getCanSort: () => boolean;
+};
+
 type TableComponent = ComponentType<Props>;
+type HeaderComponent = ComponentType<HeaderProps>;
 
 export interface PaginationProps {
   paginationConfig: PaginationTableConfig;
@@ -37,7 +45,7 @@ export interface TableUI {
   Table: TableComponent;
   TableHead: TableComponent;
   TableHeadRow: TableComponent;
-  TableHeadCell: TableComponent;
+  TableHeadCell: HeaderComponent;
   TableBody: TableComponent;
   TableRow: TableComponent;
   TableCell: TableComponent;

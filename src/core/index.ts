@@ -3,6 +3,7 @@ import {
   getCoreRowModel,
   PaginationState,
   ReactTableGenerics,
+  SortingState,
   Table as ReactTable,
   TableInstance as ReactTableInstance,
   useTableInstance,
@@ -73,11 +74,12 @@ export function useTableus<T extends ReactTableGenerics>(
     pageSize: options.config?.pageSize ?? 20,
     pageCount: -1,
   });
+  const [sorting, setSorting] = useState<SortingState>([]);
 
   const fetcherState = useFetcher<T["Row"]>({
     fetcher,
     columns,
-    tableState: { pagination },
+    tableState: { pagination, sorting },
     key,
   });
   const { data, paginationState } = fetcherState;
@@ -92,12 +94,18 @@ export function useTableus<T extends ReactTableGenerics>(
       {
         data: data ?? [],
         columns: reactTableColumns,
-        state: { pagination },
-        onPaginationChange: setPagination,
-        getCoreRowModel: getCoreRowModel(),
 
-        // consider autoResetAll as this already caused a hard to debug bug
-        autoResetPageIndex: false,
+        state: { pagination, sorting },
+
+        manualPagination: true,
+        onPaginationChange: setPagination,
+
+        manualSorting: true,
+        onSortingChange: setSorting,
+
+        autoResetAll: false,
+
+        getCoreRowModel: getCoreRowModel(),
       },
     ];
     if (reactTableOptionsProp !== undefined)
@@ -112,7 +120,7 @@ export function useTableus<T extends ReactTableGenerics>(
       reactTableInstance,
       tableConfig,
       fetcherState,
-      tableState: { pagination },
+      tableState: { pagination, sorting },
     },
     selectedRows: [],
     reactTableInstance: reactTableInstance,

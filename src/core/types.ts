@@ -5,6 +5,7 @@ import {
   Column as ReactTableColumn,
   Cell as ReactTableCell,
   PaginationState,
+  SortingState,
 } from "@tanstack/react-table";
 import { TableGenerics } from "@tanstack/react-table";
 
@@ -36,4 +37,5 @@ export interface EasyCellProps<D extends Record<string, any>> {
 
 export interface TableState {
   pagination: PaginationState;
+  sorting: SortingState;
 }
