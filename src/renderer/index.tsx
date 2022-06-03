@@ -1,14 +1,14 @@
 import React, { ReactNode } from "react";
 import { useContext } from "react";
 import {
-  PaginationState,
   TableGenerics,
   TableInstance as ReactTableInstance,
 } from "@tanstack/react-table";
-import { PaginationProps, TableUI, TableusContext } from "../context";
+import { TableusContext } from "../context";
 import { TableConfig } from "../core";
 import { FetcherState } from "../fetcher";
 import { TableState } from "../core/types";
+import { Pagination } from "./pagination";
 
 export interface Props<T extends TableGenerics> {
   reactTableInstance: ReactTableInstance<T>;
@@ -45,11 +45,7 @@ export function TableusRenderer<D extends object>({
                 return (
                   <tableUI.TableHeadCell
                     key={header.id}
-                    getToggleSortingHandler={
-                      header.column.getToggleSortingHandler
-                    }
-                    getIsSorted={header.column.getIsSorted}
-                    getCanSort={header.column.getCanSort}
+                    {...header.column}
                     {...tableComponentsProps}
                   >
                     {header.isPlaceholder
@@ -83,27 +79,4 @@ export function TableusRenderer<D extends object>({
       )}
     </>
   );
-}
-
-function Pagination<T extends TableGenerics>({
-  paginationState,
-  reactTableInstance,
-  tableUI,
-  tableConfig,
-}: {
-  paginationState: PaginationState;
-  reactTableInstance: ReactTableInstance<T>;
-  tableUI: TableUI;
-  tableConfig: TableConfig;
-}) {
-  const PaginationComponent = tableUI.TablePagination;
-  if (PaginationComponent === undefined) {
-    throw new Error("No Pagination component provided");
-  }
-  const props: PaginationProps = {
-    paginationMethods: reactTableInstance,
-    paginationState,
-    paginationConfig: tableConfig,
-  };
-  return <PaginationComponent {...props} />;
 }

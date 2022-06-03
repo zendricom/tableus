@@ -15,26 +15,27 @@ import { useContext, useEffect, useMemo, useState } from "react";
 import { TableusContext } from "../context";
 import { Fetcher, useFetcher } from "../fetcher/index";
 import { Props as TableusProps } from "../renderer/index";
-
+import queryParamSync from "./query-param-sync";
 import { translateColumns } from "./translator/index";
-import { AdditionalColumnDef, ColumnDef } from "./types";
+import { AdditionalColumnDef, ColumnDef, TableState } from "./types";
 
 export interface PaginationTableConfig {
-  pagination?: boolean;
+  pagination: boolean;
   pageSize?: number;
   pageSizeSelect?: number[];
 }
 
 export type TableConfig = PaginationTableConfig & {
-  sorting?: boolean;
-  rowSelect?: boolean;
+  sorting: boolean;
+  rowSelect: boolean;
+  syncQueryParams: boolean;
 };
 
 export interface TableOptions<T extends ReactTableGenerics> {
   columns: ColumnDef<T>[];
   fetcher: Fetcher<T["Row"]>;
   key: string;
-  config?: TableConfig;
+  config?: Partial<TableConfig>;
   reactTableOptions?: Partial<UseTableInstanceOptions<T>>;
 }
 
@@ -48,6 +49,12 @@ export function createTable<D extends Record<string, any>>() {
   const table = createReactTable().setRowType<D>();
   return table.setColumnMetaType<AdditionalColumnDef<typeof table.generics>>();
 }
+const defaultTableConfig: TableConfig = {
+  pagination: false,
+  sorting: false,
+  rowSelect: false,
+  syncQueryParams: true,
+};
 
 export function useTableus<T extends ReactTableGenerics>(
   table: ReactTable<T>,
@@ -56,10 +63,10 @@ export function useTableus<T extends ReactTableGenerics>(
   const {
     columns,
     fetcher,
-    config: tableConfig = {},
     key,
     reactTableOptions: reactTableOptionsProp,
   } = options;
+  const tableConfig = { ...defaultTableConfig, ...options.config };
 
   const context = useContext(TableusContext);
   const tableusConfig = context?.config;
@@ -69,15 +76,28 @@ export function useTableus<T extends ReactTableGenerics>(
 
   const reactTableColumns = useMemo(
     () => translateColumns(columns, tableusConfig),
-    [columns]
+    [columns, tableusConfig]
   );
+
+  const initialTableState: Partial<TableState> = queryParamSync.read(key);
 
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: options.config?.pageSize ?? 20,
     pageCount: -1,
+    ...(tableConfig.syncQueryParams && initialTableState.pagination),
   });
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const [sorting, setSorting] = useState<SortingState>(
+    initialTableState.sorting ?? []
+  );
+
+  useEffect(() => {
+    if (!tableConfig.syncQueryParams) return;
+    queryParamSync.write(key, {
+      pagination,
+      sorting,
+    });
+  }, [pagination, sorting, tableConfig.syncQueryParams]);
 
   const fetcherState = useFetcher<T["Row"]>({
     fetcher,
@@ -85,6 +105,7 @@ export function useTableus<T extends ReactTableGenerics>(
     tableState: { pagination, sorting },
     key,
   });
+
   const { data, paginationState } = fetcherState;
   useEffect(() => {
     if (paginationState !== undefined) {
@@ -93,27 +114,24 @@ export function useTableus<T extends ReactTableGenerics>(
   }, [paginationState]);
 
   const reactTableOptions: UseTableInstanceOptions<T> = useMemo(() => {
-    const configs: Partial<UseTableInstanceOptions<T>>[] = [
-      {
-        data: data ?? [],
-        columns: reactTableColumns,
+    const config: UseTableInstanceOptions<T> = {
+      data: data ?? [],
+      columns: reactTableColumns,
 
-        state: { pagination, sorting },
+      state: { pagination, sorting },
 
-        manualPagination: true,
-        onPaginationChange: setPagination,
+      manualPagination: true,
+      onPaginationChange: setPagination,
 
-        manualSorting: true,
-        onSortingChange: setSorting,
+      manualSorting: true,
+      onSortingChange: setSorting,
 
-        autoResetAll: false,
+      autoResetAll: false,
 
-        getCoreRowModel: getCoreRowModel(),
-      },
-    ];
-    if (reactTableOptionsProp !== undefined)
-      configs.push(reactTableOptionsProp);
-    return deepmerge.all<UseTableInstanceOptions<T>>(configs);
+      getCoreRowModel: getCoreRowModel(),
+    };
+    if (reactTableOptionsProp === undefined) return config;
+    return deepmerge<UseTableInstanceOptions<T>>(config, reactTableOptionsProp);
   }, [data, reactTableColumns, reactTableOptionsProp]);
 
   const reactTableInstance = useTableInstance(table, reactTableOptions);
