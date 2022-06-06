@@ -4,7 +4,7 @@ import {
   Row as ReactTableRow,
   Column as ReactTableColumn,
   Cell as ReactTableCell,
-  PaginationState,
+  PaginationState as ReactTablePaginationState,
   SortingState,
 } from "@tanstack/react-table";
 import { TableGenerics } from "@tanstack/react-table";
@@ -35,7 +35,34 @@ export interface EasyCellProps<D extends Record<string, any>> {
   cellProps: CellProps<{}>;
 }
 
+type FilterTypes = "select" | "search";
+
+export interface FilterState {
+  type: FilterTypes;
+  key: string;
+  value: any;
+}
+
+export interface FilterDefinition {
+  type: FilterTypes;
+  key: string;
+  defaultValue?: any;
+}
+
+export type FilteringState = FilterState[];
+
+export type PaginationState = ReactTablePaginationState & {
+  total?: number;
+};
+
 export interface TableState {
   pagination: PaginationState;
   sorting: SortingState;
+  filters: FilteringState;
+}
+
+export interface StateFunctions {
+  setFilters: (filters: FilteringState) => void;
+  setPagination: (pagination: PaginationState) => void;
+  setSorting: (sorting: SortingState) => void;
 }

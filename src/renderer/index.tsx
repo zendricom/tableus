@@ -4,25 +4,28 @@ import {
   TableGenerics,
   TableInstance as ReactTableInstance,
 } from "@tanstack/react-table";
-import { TableusContext } from "../context";
+import { TableUI, TableusContext } from "../context";
 import { TableConfig } from "../core";
 import { FetcherState } from "../fetcher";
-import { TableState } from "../core/types";
+import { StateFunctions, TableState } from "../core/types";
 import { Pagination } from "./pagination";
+import { FilterContainer } from "./filtering";
 
 export interface Props<T extends TableGenerics> {
   reactTableInstance: ReactTableInstance<T>;
   tableState: TableState;
   tableConfig: TableConfig;
   fetcherState: FetcherState<T["Row"]>;
+  stateFunctions: StateFunctions;
 }
 
-export function TableusRenderer<D extends object>({
+export function TableusRenderer<T extends TableGenerics>({
   reactTableInstance,
   tableConfig,
   fetcherState,
   tableState,
-}: Props<D>) {
+  stateFunctions,
+}: Props<T>) {
   const context = useContext(TableusContext);
   const config = context?.config;
   if (!config?.tableUI) {
@@ -34,6 +37,24 @@ export function TableusRenderer<D extends object>({
 
   return (
     <>
+      {tableConfig.pagination && (
+        <Pagination<T["Row"]>
+          reactTableInstance={reactTableInstance}
+          paginationState={tableState.pagination}
+          tableUI={tableUI}
+          tableConfig={tableConfig}
+          position="top"
+        />
+      )}
+      {tableConfig.filterDefinitions.length > 0 && (
+        <FilterContainer<T["Row"]>
+          {...tableComponentsProps}
+          filterDefinitions={tableConfig.filterDefinitions}
+          filters={tableState.filters}
+          tableUI={tableUI}
+          setFilters={stateFunctions.setFilters}
+        />
+      )}
       <tableUI.Table {...tableComponentsProps}>
         <tableUI.TableHead {...tableComponentsProps}>
           {reactTableInstance.getHeaderGroups().map((headerGroup) => (
@@ -70,11 +91,12 @@ export function TableusRenderer<D extends object>({
         </tableUI.TableBody>
       </tableUI.Table>
       {tableConfig.pagination && (
-        <Pagination<D>
+        <Pagination<T["Row"]>
           reactTableInstance={reactTableInstance}
           paginationState={tableState.pagination}
           tableUI={tableUI}
           tableConfig={tableConfig}
+          position="bottom"
         />
       )}
     </>

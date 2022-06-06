@@ -1,17 +1,49 @@
 import {
   PaginationInstance as ReactTablePaginationInstance,
-  PaginationState,
   SortingColumn,
 } from "@tanstack/react-table";
 import { ComponentType, createContext, ReactNode } from "react";
-import { PaginationTableConfig, TableConfig } from "./core";
-import { CellProps } from "./core/types";
 
-export type Props = {
+import { PaginationTableConfig, TableConfig } from "./core";
+import {
+  CellProps,
+  FilterDefinition,
+  FilteringState,
+  FilterState,
+  PaginationState,
+} from "./core/types";
+import { FetcherState } from "./fetcher";
+import {
+  SearchFilterDef,
+  SearchFilterState,
+  SelectFilterDef,
+  SelectFilterState,
+} from "./filtering";
+
+type RelevantFetcherState = Pick<FetcherState<{}>, "isLoading" | "error">;
+
+export interface Props {
   children: ReactNode;
-  fetcherState: { isLoading: boolean; error?: unknown };
+  fetcherState: RelevantFetcherState;
   tableConfig: TableConfig;
-};
+}
+
+export interface FilterContainerProps {
+  filterDefinitions: FilterDefinition[];
+  filters: FilteringState;
+  setFilters: (filters: FilteringState) => void;
+  fetcherState: RelevantFetcherState;
+  children: ReactNode;
+}
+
+export interface FilterProps<
+  FS extends FilterState,
+  FD extends FilterDefinition
+> {
+  filterDefinition: FD;
+  filter?: FS;
+  setFilter: (filter: FS["value"]) => void;
+}
 
 export type HeaderProps = Props & SortingColumn<any>;
 type TableComponent = ComponentType<Props>;
@@ -27,6 +59,7 @@ export interface PaginationProps {
     | "_autoResetPageIndex"
   >;
   paginationState: PaginationState;
+  position: "top" | "bottom";
 }
 export interface TooltipProps {
   children: ReactNode;
@@ -47,6 +80,10 @@ export interface TableUI {
   TableCell: TableComponent;
 
   TablePagination?: ComponentType<PaginationProps>;
+
+  FilterContainer?: ComponentType<FilterContainerProps>;
+  SelectFilter?: ComponentType<FilterProps<SelectFilterState, SelectFilterDef>>;
+  SearchFilter?: ComponentType<FilterProps<SearchFilterState, SearchFilterDef>>;
 }
 
 export interface TableusConfig {

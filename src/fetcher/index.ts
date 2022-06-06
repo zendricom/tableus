@@ -1,13 +1,13 @@
-import { PaginationState } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
+import { PaginationState as ReactTablePaginationState } from "@tanstack/react-table";
+import { TableConfig } from "../core";
 
-import { ColumnDef, TableState } from "../core/types";
+import { PaginationState, TableState } from "../core/types";
 
-export interface FetchArgs<D extends Record<string, any>> {
-  tableState?: TableState;
-  columns: ColumnDef<D>[];
-  // customFilters
+export interface FetchArgs {
+  tableState?: RelevantTableState;
+  tableConfig: TableConfig;
 }
 
 export type FetchResult<D extends Record<string, any>> =
@@ -18,13 +18,13 @@ export type FetchResult<D extends Record<string, any>> =
     };
 
 export interface Fetcher<D extends Record<string, any>> {
-  fetch(fetchArgs: FetchArgs<D>): Promise<FetchResult<D>>;
+  fetch(fetchArgs: FetchArgs): Promise<FetchResult<D>>;
 }
 
-interface Props<D extends object> {
+interface Props<D extends Record<string, any>> {
   fetcher: Fetcher<D>;
-  columns: ColumnDef<D>[];
   tableState?: TableState;
+  tableConfig: TableConfig;
   key: string;
 }
 
@@ -35,23 +35,46 @@ export interface FetcherState<D extends Record<string, any>> {
   error?: unknown;
 }
 
-export function useFetcher<D extends object>({
+export type RelevantPaginationState = Omit<
+  ReactTablePaginationState,
+  "pageCount"
+>;
+
+export type RelevantTableState = Omit<TableState, "pagination"> & {
+  pagination: RelevantPaginationState;
+};
+
+function getRelevantTableState(
+  tableState?: TableState
+): RelevantTableState | undefined {
+  if (!tableState) return undefined;
+  return {
+    ...tableState,
+    pagination: {
+      pageIndex: tableState.pagination.pageIndex,
+      pageSize: tableState.pagination.pageSize,
+    },
+  };
+}
+
+export function useFetcher<D extends Record<string, any>>({
   fetcher,
-  columns,
   tableState,
   key,
+  tableConfig,
 }: Props<D>) {
   const [oldFetchResult, setOldFetchResult] = useState<FetchResult<D>>();
+  const relevantTableState = getRelevantTableState(tableState);
   const {
     isLoading,
     error,
     data: fetchResult,
   } = useQuery({
-    queryKey: [`${key}-fetch`, tableState],
+    queryKey: [`${key}-fetch`, relevantTableState],
     queryFn: () => {
       return fetcher.fetch({
-        columns,
-        tableState,
+        tableState: relevantTableState,
+        tableConfig,
       });
     },
   });

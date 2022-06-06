@@ -1,7 +1,6 @@
 import {
   createTable as createReactTable,
   getCoreRowModel,
-  PaginationState,
   ReactTableGenerics,
   SortingState,
   Table as ReactTable,
@@ -14,10 +13,21 @@ import { useContext, useEffect, useMemo, useState } from "react";
 
 import { TableusContext } from "../context";
 import { Fetcher, useFetcher } from "../fetcher/index";
+import { getFilterStates } from "../filtering";
 import { Props as TableusProps } from "../renderer/index";
-import queryParamSync from "./query-param-sync";
+import {
+  read as readQueryParams,
+  write as writeQueryParams,
+} from "./query-param-sync";
 import { translateColumns } from "./translator/index";
-import { AdditionalColumnDef, ColumnDef, TableState } from "./types";
+import {
+  AdditionalColumnDef,
+  ColumnDef,
+  FilterDefinition,
+  FilteringState,
+  PaginationState,
+  TableState,
+} from "./types";
 
 export interface PaginationTableConfig {
   pagination: boolean;
@@ -29,6 +39,7 @@ export type TableConfig = PaginationTableConfig & {
   sorting: boolean;
   rowSelect: boolean;
   syncQueryParams: boolean;
+  filterDefinitions: FilterDefinition[];
 };
 
 export interface TableOptions<T extends ReactTableGenerics> {
@@ -54,6 +65,7 @@ const defaultTableConfig: TableConfig = {
   sorting: false,
   rowSelect: false,
   syncQueryParams: true,
+  filterDefinitions: [],
 };
 
 export function useTableus<T extends ReactTableGenerics>(
@@ -79,7 +91,9 @@ export function useTableus<T extends ReactTableGenerics>(
     [columns, tableusConfig]
   );
 
-  const initialTableState: Partial<TableState> = queryParamSync.read(key);
+  const initialTableState: Partial<TableState> = readQueryParams(key);
+  const initialFilters =
+    (tableConfig.syncQueryParams && initialTableState?.filters) || [];
 
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -90,19 +104,30 @@ export function useTableus<T extends ReactTableGenerics>(
   const [sorting, setSorting] = useState<SortingState>(
     initialTableState.sorting ?? []
   );
+  const [filters, setFilters] = useState<FilteringState>(initialFilters);
+
+  const stateFunctions = useMemo(
+    () => ({
+      setPagination,
+      setSorting,
+      setFilters,
+    }),
+    []
+  );
 
   useEffect(() => {
     if (!tableConfig.syncQueryParams) return;
-    queryParamSync.write(key, {
+    writeQueryParams(key, {
       pagination,
       sorting,
+      filters,
     });
-  }, [pagination, sorting, tableConfig.syncQueryParams]);
+  }, [pagination, sorting, filters, tableConfig.syncQueryParams]);
 
   const fetcherState = useFetcher<T["Row"]>({
     fetcher,
-    columns,
-    tableState: { pagination, sorting },
+    tableState: { pagination, sorting, filters },
+    tableConfig,
     key,
   });
 
@@ -141,7 +166,8 @@ export function useTableus<T extends ReactTableGenerics>(
       reactTableInstance,
       tableConfig,
       fetcherState,
-      tableState: { pagination, sorting },
+      tableState: { pagination, sorting, filters },
+      stateFunctions,
     },
     selectedRows: [],
     reactTableInstance: reactTableInstance,
