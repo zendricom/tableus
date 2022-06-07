@@ -1,5 +1,4 @@
 import { SortingState } from "@tanstack/react-table";
-import { TableConfig } from "../core";
 import {
   FilterDefinition,
   FilteringState,
@@ -19,8 +18,8 @@ export class LaravelRestFetcher<D extends object> implements Fetcher<D> {
     );
     const { pagination, sorting, filters } = tableState;
     if (pagination) setPaginationQueryParams(url, pagination);
-    if (sorting) setSortingQueryParams(url, sorting);
-    if (filters)
+    if (sorting.length !== 0) setSortingQueryParams(url, sorting);
+    if (filters.length !== 0)
       setFiltersQueryParams(url, filters, tableConfig.filterDefinitions);
 
     const response = await fetch(url.toString());

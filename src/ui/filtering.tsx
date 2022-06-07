@@ -38,6 +38,11 @@ export const SelectFilter = ({
           {option.label}
         </Dropdown.Item>
       ))}
+
+      <Dropdown.Divider />
+      <Dropdown.Item onClick={() => setFilter("")} active={!activeOption}>
+        Keine Filterung
+      </Dropdown.Item>
     </DropdownButton>
   );
 };
