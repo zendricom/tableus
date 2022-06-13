@@ -13,7 +13,6 @@ import { useContext, useEffect, useMemo, useState } from "react";
 
 import { TableusContext } from "../context";
 import { Fetcher, useFetcher } from "../fetcher/index";
-import { getFilterStates } from "../filtering";
 import { Props as TableusProps } from "../renderer/index";
 import {
   read as readQueryParams,
