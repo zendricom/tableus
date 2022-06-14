@@ -84,11 +84,12 @@ export function FilterComponent({
       if (SearchFilter === undefined) {
         throw new Error("SearchFilter component is not defined");
       }
+      const setFilterFunc = getSetFilterFunc(filterKey, "search");
       return (
         <SearchFilter
           filterDefinition={filterDefinition as SearchFilterDef}
           filter={filter as SearchFilterState}
-          setFilter={getSetFilterFunc(filterDefinition.key, "search")}
+          setFilter={setFilterFunc}
           key={filterDefinition.key}
           props={props}
         />

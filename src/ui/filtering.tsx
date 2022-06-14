@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   ButtonGroup,
   Dropdown,
@@ -13,6 +13,7 @@ import {
   SelectFilterDef,
   SelectFilterState,
 } from "../filtering";
+import { useDebouncedCallback } from "../helpers";
 
 export const SelectFilter = ({
   filterDefinition,
@@ -76,13 +77,19 @@ export const SearchFilter = ({
   setFilter,
   props,
 }: FilterProps<SearchFilterState, SearchFilterDef>) => {
+  const [value, setValue] = useState(filter?.value || "");
+  const debouncedSetFilter = useDebouncedCallback(setFilter, 500);
+  useEffect(() => {
+    debouncedSetFilter(value);
+  }, [value]);
+
   return (
     <InputGroup {...props}>
       <InputGroup.Text>{filterDefinition.label}</InputGroup.Text>
       <FormControl
         type="text"
-        value={filter?.value || ""}
-        onChange={(e) => setFilter(e.target.value)}
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
         placeholder={filterDefinition.placeholder}
       />
     </InputGroup>
