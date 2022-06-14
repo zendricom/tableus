@@ -5,7 +5,7 @@ import { SortUp, SortDown } from "react-bootstrap-icons";
 import { Table as BootstrapTable, TableProps } from "react-bootstrap";
 import { HeaderProps, Props, TableUI } from "../context";
 import { Pagination } from "./pagination";
-import { FilterContainer, SearchFilter, SelectFilter } from "./filtering";
+import { SearchFilter, SelectFilter } from "./filtering";
 
 const DEFAULT_EMPTY_VALUE = "-";
 
@@ -86,7 +86,6 @@ export function initTableComponents(configArg: Partial<Config>): TableUI {
 
     TablePagination: Pagination,
 
-    FilterContainer: FilterContainer,
     SelectFilter: SelectFilter,
     SearchFilter: SearchFilter,
   };

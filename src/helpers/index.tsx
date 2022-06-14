@@ -1,5 +1,6 @@
 import { Renderable } from "@tanstack/react-table";
-import React, { ComponentType } from "react";
+import React, { ComponentType, useContext } from "react";
+import { TableusContext } from "../context";
 
 export function flexRender(Comp: Renderable<any>, props: any) {
   return isReactComponent(Comp) ? <Comp {...props} /> : Comp;
@@ -33,4 +34,13 @@ function isExoticComponent(component: Renderable<any>) {
     // @ts-ignore
     ["react.memo", "react.forward_ref"].includes(component.$$typeof.description)
   );
+}
+
+export function useTableusConfig() {
+  const context = useContext(TableusContext);
+  const config = context?.config;
+  if (!config?.tableUI) {
+    throw new Error("No UI context provided");
+  }
+  return config;
 }

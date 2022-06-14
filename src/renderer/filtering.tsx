@@ -9,6 +9,7 @@ import {
   SelectFilterDef,
   SelectFilterState,
 } from "../filtering";
+import { useTableusConfig } from "../helpers";
 
 export interface FilterContainerProps<D extends Record<string, any>> {
   filters: FilteringState;
@@ -35,11 +36,7 @@ export function FilterComponent({
   filterKey,
   props,
 }: FilterComponentProps) {
-  const context = useContext(TableusContext);
-  const config = context?.config;
-  if (!config?.tableUI) {
-    throw new Error("No UI context provided");
-  }
+  const config = useTableusConfig();
   const { tableUI } = config;
 
   const filter = filters.find((f) => f.key === filterKey);

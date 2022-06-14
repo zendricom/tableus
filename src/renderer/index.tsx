@@ -1,15 +1,13 @@
 import React, { ReactNode } from "react";
-import { useContext } from "react";
 import {
   TableGenerics,
   TableInstance as ReactTableInstance,
 } from "@tanstack/react-table";
-import { TableUI, TableusContext } from "../context";
 import { TableConfig } from "../core";
 import { FetcherState } from "../fetcher";
 import { StateFunctions, TableState } from "../core/types";
 import { Pagination } from "./pagination";
-import { FilterContainer } from "./filtering";
+import { useTableusConfig } from "../helpers";
 
 export interface Props<T extends TableGenerics> {
   reactTableInstance: ReactTableInstance<T>;
@@ -26,11 +24,7 @@ export function TableusRenderer<T extends TableGenerics>({
   tableState,
   stateFunctions,
 }: Props<T>) {
-  const context = useContext(TableusContext);
-  const config = context?.config;
-  if (!config?.tableUI) {
-    throw new Error("No UI context provided");
-  }
+  const config = useTableusConfig();
   const { tableUI } = config;
 
   const tableComponentsProps = { fetcherState, tableConfig };
@@ -41,7 +35,6 @@ export function TableusRenderer<T extends TableGenerics>({
         <Pagination<T["Row"]>
           reactTableInstance={reactTableInstance}
           paginationState={tableState.pagination}
-          tableUI={tableUI}
           tableConfig={tableConfig}
           position="top"
         />
@@ -85,7 +78,6 @@ export function TableusRenderer<T extends TableGenerics>({
         <Pagination<T["Row"]>
           reactTableInstance={reactTableInstance}
           paginationState={tableState.pagination}
-          tableUI={tableUI}
           tableConfig={tableConfig}
           position="bottom"
         />

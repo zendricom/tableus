@@ -51,7 +51,7 @@ export interface PaginationProps {
     | "_autoResetPageIndex"
   >;
   paginationState: PaginationState;
-  position: "top" | "bottom";
+  position: "top" | "bottom" | "custom";
 }
 export interface TooltipProps {
   children: ReactNode;

@@ -15,6 +15,8 @@ import { TableusContext } from "../context";
 import { Fetcher, useFetcher } from "../fetcher/index";
 import { FilterComponentProps } from "../renderer/filtering";
 import { Props as TableusProps } from "../renderer/index";
+import { Props as PaginationProps } from "../renderer/pagination";
+
 import {
   read as readQueryParams,
   write as writeQueryParams,
@@ -52,9 +54,11 @@ export interface TableOptions<T extends ReactTableGenerics> {
 
 export interface TableStateInstance<T extends ReactTableGenerics> {
   tableusProps: TableusProps<T>;
-  filterComponentProps: Omit<FilterComponentProps, "filterKey">;
   selectedRows: any[];
   reactTableInstance: ReactTableInstance<T>;
+
+  filterComponentProps: Omit<FilterComponentProps, "filterKey">;
+  paginationComponentProps: PaginationProps<T>;
 }
 
 export function createTable<D extends Record<string, any>>() {
@@ -98,7 +102,7 @@ export function useTableus<T extends ReactTableGenerics>(
 
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
-    pageSize: options.config?.pageSize ?? 20,
+    pageSize: options.config?.pageSize ?? 25,
     pageCount: -1,
     ...(tableConfig.syncQueryParams && initialTableState.pagination),
   });
@@ -174,6 +178,12 @@ export function useTableus<T extends ReactTableGenerics>(
       filters,
       setFilters,
       filterDefinitions: options.config?.filterDefinitions ?? [],
+    },
+    paginationComponentProps: {
+      paginationState: pagination,
+      reactTableInstance: reactTableInstance,
+      tableConfig: tableConfig,
+      position: "custom",
     },
     selectedRows: [],
     reactTableInstance: reactTableInstance,
