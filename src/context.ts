@@ -33,7 +33,7 @@ export interface FilterProps<
 > {
   filterDefinition: FD;
   filter?: FS;
-  setFilter: (filter: FS["value"]) => void;
+  setFilter: (filter: FS["value"] | ((value: FS["value"]) => void)) => void;
   props?: any;
 }
 

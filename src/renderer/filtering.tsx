@@ -49,7 +49,7 @@ export function FilterComponent({
     key: string,
     type: F["type"]
   ) => {
-    return (value: F["value"]) => {
+    return (value: F["value"] | ((value: F["value"]) => void)) => {
       if (value === undefined || value === null || value === "") {
         setFilters(filters.filter((f) => f.key !== key));
         return;
@@ -58,15 +58,18 @@ export function FilterComponent({
       const filterExists = filters.find((f) => f.key === key);
 
       if (!filterExists) {
-        setFilters([...filters, { key, value, type }]);
+        const newValue = value instanceof Function ? value(undefined) : value;
+        setFilters([...filters, { key, value: newValue, type }]);
         return;
       }
 
       const newFilters = filters.map((filter) => {
         if (filter.key === key) {
+          const newValue =
+            value instanceof Function ? value(filter.value) : value;
           return {
             ...filter,
-            value,
+            value: newValue,
           };
         }
         return filter;

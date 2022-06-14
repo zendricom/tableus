@@ -61,6 +61,7 @@ function setFiltersQueryParams(
   filters: FilteringState,
   filterDefinitions: FilterDefinition[]
 ) {
+  console.log(filters);
   const zippedFilters = filters.map((filter) => {
     const filterDefinition = filterDefinitions.find(
       (definition) => definition.key === filter.key

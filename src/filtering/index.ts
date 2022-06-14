@@ -17,13 +17,13 @@ export interface SelectFilterDef extends FilterDefinition {
   type: "select";
   label: string;
   options: SelectOption[];
-  defaultValue?: SelectOption["value"];
+  defaultValue?: SelectOption["value"] | SelectOption["value"][];
   isMulti?: boolean;
 }
 export interface SelectFilterState {
   type: "select";
   key: string;
-  value: SelectOption["value"];
+  value: SelectOption["value"] | SelectOption["value"][];
 }
 export function defineSelectFilter(
   args: Omit<SelectFilterDef, "type">

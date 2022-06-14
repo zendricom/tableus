@@ -20,9 +20,13 @@ export const SelectFilter = ({
   setFilter,
   props,
 }: FilterProps<SelectFilterState, SelectFilterDef>) => {
-  const activeOption = filterDefinition.options.find(
-    (option) => option.value === filter?.value
+  const isMulti = filterDefinition.isMulti;
+  const activeOptions = filterDefinition.options.filter((option) =>
+    isMulti
+      ? (filter?.value as string[] | undefined)?.includes(option.value)
+      : filter?.value === option.value
   );
+
   return (
     <DropdownButton
       title={filterDefinition.label}
@@ -30,18 +34,36 @@ export const SelectFilter = ({
       as={ButtonGroup}
       {...props}
     >
-      {filterDefinition.options.map((option) => (
-        <Dropdown.Item
-          active={option.value === filter?.value}
-          key={option.value}
-          onClick={() => setFilter(option.value)}
-        >
-          {option.label}
-        </Dropdown.Item>
-      ))}
+      {filterDefinition.options.map((option) => {
+        const isActive = activeOptions.includes(option);
+        const handleClick = () => {
+          if (!isMulti) {
+            setFilter(option.value);
+            return;
+          }
+          setFilter((prev) =>
+            isActive
+              ? (prev as string[]).filter((o) => o !== option.value)
+              : [...(prev ? prev : []), option.value]
+          );
+        };
+
+        return (
+          <Dropdown.Item
+            active={isActive}
+            key={option.value}
+            onClick={handleClick}
+          >
+            {option.label}
+          </Dropdown.Item>
+        );
+      })}
 
       <Dropdown.Divider />
-      <Dropdown.Item onClick={() => setFilter("")} active={!activeOption}>
+      <Dropdown.Item
+        onClick={() => setFilter(isMulti ? [] : "")}
+        active={activeOptions.length === 0}
+      >
         Keine Filterung
       </Dropdown.Item>
     </DropdownButton>
