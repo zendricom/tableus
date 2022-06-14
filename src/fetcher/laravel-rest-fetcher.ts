@@ -74,7 +74,12 @@ function setFiltersQueryParams(
   });
 
   zippedFilters.forEach(({ filter, filterDefinition }) => {
-    if (!filter.value) return;
+    if (
+      filter.value === null ||
+      filter.value === undefined ||
+      filter.value === ""
+    )
+      return;
     switch (filter.type) {
       case "search":
         url.searchParams.set(`filter[${filter.key}]=`, filter.value);

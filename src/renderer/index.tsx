@@ -46,15 +46,6 @@ export function TableusRenderer<T extends TableGenerics>({
           position="top"
         />
       )}
-      {tableConfig.filterDefinitions.length > 0 && (
-        <FilterContainer<T["Row"]>
-          {...tableComponentsProps}
-          filterDefinitions={tableConfig.filterDefinitions}
-          filters={tableState.filters}
-          tableUI={tableUI}
-          setFilters={stateFunctions.setFilters}
-        />
-      )}
       <tableUI.Table {...tableComponentsProps}>
         <tableUI.TableHead {...tableComponentsProps}>
           {reactTableInstance.getHeaderGroups().map((headerGroup) => (

@@ -1,5 +1,5 @@
-import React from "react";
-import { TableUI } from "../context";
+import React, { useContext } from "react";
+import { TableUI, TableusContext } from "../context";
 import { TableConfig } from "../core";
 import { FilterDefinition, FilteringState, FilterState } from "../core/types";
 import { FetcherState } from "../fetcher";
@@ -19,34 +19,41 @@ export interface FilterContainerProps<D extends Record<string, any>> {
   setFilters: (filters: FilteringState) => void;
 }
 
-export function FilterContainer<D extends Record<string, any>>({
-  filters,
+export interface FilterComponentProps {
+  filterDefinitions: FilterDefinition[];
+  filters: FilteringState;
+  setFilters: (filters: FilteringState) => void;
+
+  filterKey: FilterDefinition["key"];
+  props?: any;
+}
+
+export function FilterComponent({
   filterDefinitions,
-  tableUI,
-  fetcherState,
+  filters,
   setFilters,
-}: FilterContainerProps<D>) {
-  if (filterDefinitions.length === 0) return null;
-
-  const FilterContainerComponent = tableUI.FilterContainer;
-  if (FilterContainerComponent === undefined) {
-    throw new Error("FilterContainer component is not defined");
+  filterKey,
+  props,
+}: FilterComponentProps) {
+  const context = useContext(TableusContext);
+  const config = context?.config;
+  if (!config?.tableUI) {
+    throw new Error("No UI context provided");
   }
+  const { tableUI } = config;
 
-  const zippedFilters = filterDefinitions.map((filterDefinition) => {
-    const filter = filters.find((f) => f.key === filterDefinition.key);
-    return {
-      filterDefinition,
-      filter,
-    };
-  });
+  const filter = filters.find((f) => f.key === filterKey);
+  const filterDefinition = filterDefinitions.find((f) => f.key === filterKey);
+  if (filterDefinition === undefined) {
+    throw new Error(`Filter ${filterKey} not found`);
+  }
 
   const getSetFilterFunc = <F extends FilterState>(
     key: string,
     type: F["type"]
   ) => {
     return (value: F["value"]) => {
-      if (!value) {
+      if (value === undefined || value === null || value === "") {
         setFilters(filters.filter((f) => f.key !== key));
         return;
       }
@@ -71,48 +78,39 @@ export function FilterContainer<D extends Record<string, any>>({
     };
   };
 
-  return (
-    <FilterContainerComponent
-      filters={filters}
-      filterDefinitions={filterDefinitions}
-      fetcherState={fetcherState}
-      setFilters={setFilters}
-    >
-      {zippedFilters.map(({ filterDefinition, filter }) => {
-        switch (filterDefinition.type) {
-          case "search":
-            const SearchFilter = tableUI.SearchFilter;
-            if (SearchFilter === undefined) {
-              throw new Error("SearchFilter component is not defined");
-            }
-            return (
-              <SearchFilter
-                filterDefinition={filterDefinition as SearchFilterDef}
-                filter={filter as SearchFilterState}
-                setFilter={getSetFilterFunc(filterDefinition.key, "search")}
-                key={filterDefinition.key}
-              />
-            );
-          case "select":
-            const SelectFilter = tableUI.SelectFilter;
-            if (SelectFilter === undefined) {
-              throw new Error("SelectFilter component is not defined");
-            }
-            return (
-              <SelectFilter
-                filterDefinition={filterDefinition as SelectFilterDef}
-                filter={filter as SelectFilterState}
-                setFilter={getSetFilterFunc<SelectFilterState>(
-                  filterDefinition.key,
-                  "select"
-                )}
-                key={filterDefinition.key}
-              />
-            );
-          default:
-            throw new Error("Unknown filter type");
-        }
-      })}
-    </FilterContainerComponent>
-  );
+  switch (filterDefinition.type) {
+    case "search":
+      const SearchFilter = tableUI.SearchFilter;
+      if (SearchFilter === undefined) {
+        throw new Error("SearchFilter component is not defined");
+      }
+      return (
+        <SearchFilter
+          filterDefinition={filterDefinition as SearchFilterDef}
+          filter={filter as SearchFilterState}
+          setFilter={getSetFilterFunc(filterDefinition.key, "search")}
+          key={filterDefinition.key}
+          props={props}
+        />
+      );
+    case "select":
+      const SelectFilter = tableUI.SelectFilter;
+      if (SelectFilter === undefined) {
+        throw new Error("SelectFilter component is not defined");
+      }
+      return (
+        <SelectFilter
+          filterDefinition={filterDefinition as SelectFilterDef}
+          filter={filter as SelectFilterState}
+          setFilter={getSetFilterFunc<SelectFilterState>(
+            filterDefinition.key,
+            "select"
+          )}
+          key={filterDefinition.key}
+          props={props}
+        />
+      );
+    default:
+      throw new Error("Unknown filter type");
+  }
 }

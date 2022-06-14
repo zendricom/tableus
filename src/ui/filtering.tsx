@@ -1,11 +1,12 @@
 import React from "react";
 import {
+  ButtonGroup,
   Dropdown,
   DropdownButton,
   FormControl,
   InputGroup,
 } from "react-bootstrap";
-import { FilterContainerProps, FilterProps } from "../context";
+import { FilterProps } from "../context";
 import {
   SearchFilterDef,
   SearchFilterState,
@@ -13,21 +14,21 @@ import {
   SelectFilterState,
 } from "../filtering";
 
-export const FilterContainer = (props: FilterContainerProps) => {
-  return <div>{props.children}</div>;
-};
-
 export const SelectFilter = ({
   filterDefinition,
   filter,
   setFilter,
+  props,
 }: FilterProps<SelectFilterState, SelectFilterDef>) => {
   const activeOption = filterDefinition.options.find(
     (option) => option.value === filter?.value
   );
   return (
     <DropdownButton
-      title={activeOption ? activeOption.label : filterDefinition.label}
+      title={filterDefinition.label}
+      variant="secondary"
+      as={ButtonGroup}
+      {...props}
     >
       {filterDefinition.options.map((option) => (
         <Dropdown.Item
@@ -51,9 +52,10 @@ export const SearchFilter = ({
   filterDefinition,
   filter,
   setFilter,
+  props,
 }: FilterProps<SearchFilterState, SearchFilterDef>) => {
   return (
-    <InputGroup>
+    <InputGroup {...props}>
       <InputGroup.Text>{filterDefinition.label}</InputGroup.Text>
       <FormControl
         type="text"

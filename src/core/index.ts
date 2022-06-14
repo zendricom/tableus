@@ -13,6 +13,7 @@ import { useContext, useEffect, useMemo, useState } from "react";
 
 import { TableusContext } from "../context";
 import { Fetcher, useFetcher } from "../fetcher/index";
+import { FilterComponentProps } from "../renderer/filtering";
 import { Props as TableusProps } from "../renderer/index";
 import {
   read as readQueryParams,
@@ -51,6 +52,7 @@ export interface TableOptions<T extends ReactTableGenerics> {
 
 export interface TableStateInstance<T extends ReactTableGenerics> {
   tableusProps: TableusProps<T>;
+  filterComponentProps: Omit<FilterComponentProps, "filterKey">;
   selectedRows: any[];
   reactTableInstance: ReactTableInstance<T>;
 }
@@ -167,6 +169,11 @@ export function useTableus<T extends ReactTableGenerics>(
       fetcherState,
       tableState: { pagination, sorting, filters },
       stateFunctions,
+    },
+    filterComponentProps: {
+      filters,
+      setFilters,
+      filterDefinitions: options.config?.filterDefinitions ?? [],
     },
     selectedRows: [],
     reactTableInstance: reactTableInstance,

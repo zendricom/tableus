@@ -8,7 +8,6 @@ import { PaginationTableConfig, TableConfig } from "./core";
 import {
   CellProps,
   FilterDefinition,
-  FilteringState,
   FilterState,
   PaginationState,
 } from "./core/types";
@@ -28,14 +27,6 @@ export interface Props {
   tableConfig: TableConfig;
 }
 
-export interface FilterContainerProps {
-  filterDefinitions: FilterDefinition[];
-  filters: FilteringState;
-  setFilters: (filters: FilteringState) => void;
-  fetcherState: RelevantFetcherState;
-  children: ReactNode;
-}
-
 export interface FilterProps<
   FS extends FilterState,
   FD extends FilterDefinition
@@ -43,6 +34,7 @@ export interface FilterProps<
   filterDefinition: FD;
   filter?: FS;
   setFilter: (filter: FS["value"]) => void;
+  props?: any;
 }
 
 export type HeaderProps = Props & SortingColumn<any>;
@@ -81,7 +73,6 @@ export interface TableUI {
 
   TablePagination?: ComponentType<PaginationProps>;
 
-  FilterContainer?: ComponentType<FilterContainerProps>;
   SelectFilter?: ComponentType<FilterProps<SelectFilterState, SelectFilterDef>>;
   SearchFilter?: ComponentType<FilterProps<SearchFilterState, SearchFilterDef>>;
 }
