@@ -1,19 +1,24 @@
-import { FilterDefinition, FilterState } from "../core/types";
+import {
+  BuiltinFilterDefinition,
+  CustomFilterDefinition,
+  CustomFilterRenderer,
+  CustomFilterState,
+} from "../core/types";
 
-export function getFilterStates(filters: FilterDefinition[]): FilterState[] {
-  return filters.map((filter) => ({
-    key: filter.key,
-    type: filter.type,
-    value: filter.defaultValue || null,
-  }));
-}
+// export function getFilterStates(filters: FilterDefinition[]): FilterState[] {
+//   return filters.map((filter) => ({
+//     key: filter.key,
+//     type: filter.type,
+//     value: filter.defaultValue || null,
+//   }));
+// }
 
 export interface SelectOption {
   label: string;
   value: string;
 }
 
-export interface SelectFilterDef extends FilterDefinition {
+export interface SelectFilterDef extends BuiltinFilterDefinition {
   type: "select";
   label: string;
   options: SelectOption[];
@@ -34,7 +39,7 @@ export function defineSelectFilter(
   };
 }
 
-export interface SearchFilterDef extends FilterDefinition {
+export interface SearchFilterDef extends BuiltinFilterDefinition {
   type: "search";
   label: string;
   placeholder?: string;
@@ -52,4 +57,13 @@ export function defineSearchFilter(
     type: "search",
     ...args,
   };
+}
+
+export function defineCustomFilter<D>(
+  props: Omit<CustomFilterDefinition<CustomFilterState<D>>, "type">
+): CustomFilterDefinition<CustomFilterState<D>> {
+  return {
+    ...props,
+    type: "custom",
+  } as CustomFilterDefinition<CustomFilterState<D>>;
 }

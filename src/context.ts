@@ -7,6 +7,8 @@ import { ComponentType, createContext, ReactNode } from "react";
 import { PaginationTableConfig, TableConfig } from "./core";
 import {
   CellProps,
+  CustomFilterDefinition,
+  CustomFilterState,
   FilterDefinition,
   FilterState,
   PaginationState,

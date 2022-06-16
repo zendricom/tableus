@@ -1,13 +1,16 @@
 import {
-  ColumnDef as ReactTableColumnDef,
-  TableInstance as ReactTableInstance,
-  Row as ReactTableRow,
-  Column as ReactTableColumn,
   Cell as ReactTableCell,
+  Column as ReactTableColumn,
+  ColumnDef as ReactTableColumnDef,
   PaginationState as ReactTablePaginationState,
+  Row as ReactTableRow,
   SortingState,
+  TableGenerics,
+  TableInstance as ReactTableInstance,
 } from "@tanstack/react-table";
-import { TableGenerics } from "@tanstack/react-table";
+import { ComponentType } from "react";
+
+import { FilterProps } from "../context";
 
 export type ColumnValueType = "date" | "datetime";
 
@@ -37,23 +40,62 @@ export interface EasyCellProps<D extends Record<string, any>> {
 
 type FilterTypes = "select" | "search";
 
-export interface FilterState {
-  type: FilterTypes;
+export interface CoreFilterState {
+  type: string;
   key: string;
   value: any;
 }
-
-export interface FilterDefinition {
+export interface BuiltinFilterState extends CoreFilterState {
   type: FilterTypes;
+}
+
+export type CustomFilterState<D> = CoreFilterState & {
+  type: "custom";
+  key: string;
+  value: D;
+};
+
+export type FilterState = BuiltinFilterState | CustomFilterState<any>;
+
+export interface CoreFilterDefinition {
+  type: string;
   key: string;
   defaultValue?: any;
 }
 
+export interface BuiltinFilterDefinition extends CoreFilterDefinition {
+  type: FilterTypes;
+}
+
+export function isBuiltinFilterDefinition(
+  filter: FilterDefinition
+): filter is BuiltinFilterDefinition {
+  return filter.type !== "custom";
+}
+
+export type CustomFilterRenderer<S extends CustomFilterState<any>> =
+  ComponentType<FilterProps<S, CustomFilterDefinition<S>>>;
+
+export type CustomFilterTranslator<S extends CustomFilterState<any>> = (
+  filter: S,
+  args: any
+) => any;
+
+export interface CustomFilterDefinition<S extends CustomFilterState<any>>
+  extends CoreFilterDefinition {
+  renderer: CustomFilterRenderer<S>;
+  translator: CustomFilterTranslator<S>;
+  type: "custom";
+  [key: string]: any;
+}
+
+export type FilterDefinition =
+  | BuiltinFilterDefinition
+  | CustomFilterDefinition<any>;
+
 export type FilteringState = FilterState[];
 
-export type PaginationState = ReactTablePaginationState & {
-  total?: number;
-};
+export type PaginationState = ReactTablePaginationState & { total?: number };
 
 export interface TableState {
   pagination: PaginationState;

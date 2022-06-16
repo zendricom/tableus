@@ -1,7 +1,12 @@
 import React, { useContext } from "react";
 import { TableUI, TableusContext } from "../context";
 import { TableConfig } from "../core";
-import { FilterDefinition, FilteringState, FilterState } from "../core/types";
+import {
+  FilterDefinition,
+  FilteringState,
+  FilterState,
+  isBuiltinFilterDefinition,
+} from "../core/types";
 import { FetcherState } from "../fetcher";
 import {
   SearchFilterDef,
@@ -78,20 +83,32 @@ export function FilterComponent({
     };
   };
 
+  if (!isBuiltinFilterDefinition(filterDefinition)) {
+    const Renderer = filterDefinition.renderer;
+    return (
+      <Renderer
+        filterDefinition={filterDefinition}
+        filter={filter}
+        key={filterDefinition.key}
+        props={props}
+        setFilter={getSetFilterFunc(filterKey, filterDefinition.type)}
+      />
+    );
+  }
+
   switch (filterDefinition.type) {
     case "search":
       const SearchFilter = tableUI.SearchFilter;
       if (SearchFilter === undefined) {
         throw new Error("SearchFilter component is not defined");
       }
-      const setFilterFunc = getSetFilterFunc(filterKey, "search");
       return (
         <SearchFilter
           filterDefinition={filterDefinition as SearchFilterDef}
           filter={filter as SearchFilterState}
-          setFilter={setFilterFunc}
           key={filterDefinition.key}
           props={props}
+          setFilter={getSetFilterFunc(filterKey, "search")}
         />
       );
     case "select":
@@ -103,12 +120,12 @@ export function FilterComponent({
         <SelectFilter
           filterDefinition={filterDefinition as SelectFilterDef}
           filter={filter as SelectFilterState}
+          key={filterDefinition.key}
+          props={props}
           setFilter={getSetFilterFunc<SelectFilterState>(
             filterDefinition.key,
             "select"
           )}
-          key={filterDefinition.key}
-          props={props}
         />
       );
     default:

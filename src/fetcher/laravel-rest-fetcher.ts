@@ -2,6 +2,7 @@ import { SortingState } from "@tanstack/react-table";
 import {
   FilterDefinition,
   FilteringState,
+  isBuiltinFilterDefinition,
   PaginationState,
 } from "../core/types";
 import { FetchArgs, Fetcher, FetchResult } from "./index";
@@ -80,10 +81,14 @@ function setFiltersQueryParams(
       filter.value === ""
     )
       return;
+
+    if (!isBuiltinFilterDefinition(filterDefinition)) {
+      filterDefinition.translator(filter, url);
+      return;
+    }
+
     switch (filter.type) {
       case "search":
-        url.searchParams.set(`filter[${filter.key}]=`, filter.value);
-        break;
       case "select":
         url.searchParams.set(`filter[${filter.key}]=`, filter.value);
         break;
