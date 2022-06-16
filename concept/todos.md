@@ -4,3 +4,4 @@
 - move fetcher to own package
 - allow to add custom filters
 - test fetcher without pagination
+- how to decide what interfaces/types to export and how?

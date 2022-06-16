@@ -119,7 +119,7 @@ class ColumnTranslator<T extends TableGenerics> {
         return (props) => <DateTimeCell {...props} />;
     }
     // @ts-ignore https://stackoverflow.com/questions/72392225/reactnode-is-not-a-valid-jsx-element
-    return (props) => props.getValue() || <EmptyValue />;
+    return (props) => props.getValue() || flexRender(EmptyValue);
   }
 
   makeEasyCellProps(props: CellProps<T>) {

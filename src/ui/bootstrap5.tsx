@@ -3,7 +3,7 @@ import "./bootstrap5.css";
 import React from "react";
 import { SortUp, SortDown } from "react-bootstrap-icons";
 import { Table as BootstrapTable, TableProps } from "react-bootstrap";
-import { HeaderProps, Props, TableUI } from "../context";
+import { HeaderProps, TableComponentProps, TableUI } from "../context";
 import { Pagination } from "./pagination";
 import { SearchFilter, SelectFilter } from "./filtering";
 
@@ -23,7 +23,7 @@ export function initTableComponents(configArg: Partial<Config>): TableUI {
     ...configArg,
   };
   return {
-    Table: (props: Props) => {
+    Table: (props: TableComponentProps) => {
       const className = props.fetcherState.isLoading ? "bs5-filter-blur" : "";
       return (
         <BootstrapTable {...config.tableProps} className={className}>
@@ -32,11 +32,11 @@ export function initTableComponents(configArg: Partial<Config>): TableUI {
       );
     },
 
-    TableHead: (props: Props) => {
+    TableHead: (props: TableComponentProps) => {
       return <thead>{props.children}</thead>;
     },
 
-    TableHeadRow: (props: Props) => {
+    TableHeadRow: (props: TableComponentProps) => {
       return <tr>{props.children}</tr>;
     },
 
@@ -72,15 +72,15 @@ export function initTableComponents(configArg: Partial<Config>): TableUI {
       );
     },
 
-    TableBody: (props: Props) => {
+    TableBody: (props: TableComponentProps) => {
       return <tbody>{props.children}</tbody>;
     },
 
-    TableRow: (props: Props) => {
+    TableRow: (props: TableComponentProps) => {
       return <tr>{props.children}</tr>;
     },
 
-    TableCell: (props: Props) => {
+    TableCell: (props: TableComponentProps) => {
       return <td>{props.children}</td>;
     },
 

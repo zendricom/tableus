@@ -21,7 +21,7 @@ import {
 
 type RelevantFetcherState = Pick<FetcherState<{}>, "isLoading" | "error">;
 
-export interface Props {
+export interface TableComponentProps {
   children: ReactNode;
   fetcherState: RelevantFetcherState;
   tableConfig: TableConfig;
@@ -37,8 +37,8 @@ export interface FilterProps<
   props?: any;
 }
 
-export type HeaderProps = Props & SortingColumn<any>;
-type TableComponent = ComponentType<Props>;
+export type HeaderProps = TableComponentProps & SortingColumn<any>;
+type TableComponent = ComponentType<TableComponentProps>;
 type HeaderComponent = ComponentType<HeaderProps>;
 
 export interface PaginationProps {
@@ -80,7 +80,7 @@ export interface TableUI {
 export interface TableusConfig {
   tableUI: TableUI;
 
-  EmptyValue: () => ReactNode;
+  EmptyValue: (() => ReactNode) | string | number | null | undefined;
 
   DateCell?: (props: CellProps<{}>) => ReactNode;
   DatetimeCell?: (props: CellProps<{}>) => ReactNode;
