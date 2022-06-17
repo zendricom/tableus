@@ -26,9 +26,7 @@
     "react-bootstrap-icons": "^1.8.2",
     "stylelint-config-prettier": "^9.0.3",
     "typescript": "^4.7.0-beta",
-    "react-dom": "^16.14.0",
-    "tableus-fetcher-laravel-rest": "git+https://github.com/zendricom/tableus-fetcher-laravel-rest.git",
-    "tableus-ui-bootstrap5": "git+https://github.com/zendricom/tableus-ui-bootstrap5.git"
+    "react-dom": "^16.14.0"
   },
   "peerDependencies": {
     "@tanstack/react-table": ">=8.0.0-beta.9",
