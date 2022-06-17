@@ -30,7 +30,10 @@ export function Pagination<T extends TableGenerics>({
   }
   const props: PaginationProps = {
     paginationMethods: reactTableInstance,
-    paginationState,
+    paginationState: {
+      ...paginationState,
+      pageCount: reactTableInstance.getPageCount(),
+    },
     paginationConfig: tableConfig,
     position,
   };

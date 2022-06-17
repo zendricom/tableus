@@ -14,7 +14,7 @@ export type FetchResult<D extends Record<string, any>> =
   | D[]
   | {
       data: D[];
-      paginationState: PaginationState;
+      paginationState: PaginationState & { pageCount: number };
     };
 
 export interface Fetcher<D extends Record<string, any>> {

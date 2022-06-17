@@ -103,7 +103,6 @@ export function useTableus<T extends ReactTableGenerics>(
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: options.config?.pageSize ?? 25,
-    pageCount: -1,
     ...(tableConfig.syncQueryParams && initialTableState.pagination),
   });
   const [sorting, setSorting] = useState<SortingState>(

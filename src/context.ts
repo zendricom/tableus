@@ -52,7 +52,7 @@ export interface PaginationProps {
     | "_getPaginationRowModel"
     | "_autoResetPageIndex"
   >;
-  paginationState: PaginationState;
+  paginationState: PaginationState & { pageCount: number };
   position: "top" | "bottom" | "custom";
 }
 export interface TooltipProps {
