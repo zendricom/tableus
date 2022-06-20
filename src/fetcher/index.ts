@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { PaginationState as ReactTablePaginationState } from "@tanstack/react-table";
+import { TableInstance as ReactTableInstance } from "@tanstack/react-table";
 import { TableConfig } from "../core";
 
 import { PaginationState, TableState } from "../core/types";
@@ -14,7 +15,7 @@ export type FetchResult<D extends Record<string, any>> =
   | D[]
   | {
       data: D[];
-      paginationState: PaginationState & { pageCount: number };
+      paginationState: PaginationState;
     };
 
 export interface Fetcher<D extends Record<string, any>> {

@@ -95,7 +95,10 @@ export type FilterDefinition =
 
 export type FilteringState = FilterState[];
 
-export type PaginationState = ReactTablePaginationState & { total?: number };
+export type PaginationState = ReactTablePaginationState & {
+  total?: number;
+  pageCount?: number;
+};
 
 export interface TableState {
   pagination: PaginationState;
