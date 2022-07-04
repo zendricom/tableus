@@ -2,7 +2,8 @@ import {
   PaginationInstance as ReactTablePaginationInstance,
   SortingColumn,
 } from "@tanstack/react-table";
-import { ComponentType, createContext, ReactNode } from "react";
+import { ComponentType, createContext, ReactNode, useMemo } from "react";
+import React from "react";
 
 import { PaginationTableConfig, TableConfig } from "./core";
 import {
@@ -79,20 +80,39 @@ export interface TableUI {
   SearchFilter?: ComponentType<FilterProps<SearchFilterState, SearchFilterDef>>;
 }
 
-export interface TableusConfig {
+export type TableusConfig = Pick<
+  PaginationTableConfig,
+  "pageSize" | "pageSizeSelect"
+> & {
   tableUI: TableUI;
 
-  EmptyValue: (() => ReactNode) | string | number | null | undefined;
+  EmptyValue?: (() => ReactNode) | string | number | null | undefined;
 
   DateCell?: (props: CellProps<{}>) => ReactNode;
   DatetimeCell?: (props: CellProps<{}>) => ReactNode;
+  TimeCell?: (props: CellProps<{}>) => ReactNode;
 
   Link?: ComponentType<LinkProps>;
   Tooltip?: ComponentType<TooltipProps>;
-}
+};
 
 interface Context {
   config: TableusConfig;
 }
 
 export const TableusContext = createContext<Context | null>(null);
+
+export const TableusContextProvider = ({
+  config,
+  children,
+}: {
+  config: TableusConfig;
+  children: ReactNode;
+}) => {
+  return (
+    <TableusContext.Provider
+      value={useMemo(() => ({ config }), [config])}
+      children={children}
+    />
+  );
+};

@@ -11,7 +11,7 @@ import {
 import deepmerge from "deepmerge";
 import { useContext, useEffect, useMemo, useState } from "react";
 
-import { TableusContext } from "../context";
+import { TableusConfig, TableusContext } from "../context";
 import { Fetcher, useFetcher } from "../fetcher/index";
 import { FilterComponentProps } from "../renderer/filtering";
 import { Props as TableusProps } from "../renderer/index";
@@ -75,21 +75,21 @@ const defaultTableConfig: TableConfig = {
 
 export function useTableus<T extends ReactTableGenerics>(
   table: ReactTable<T>,
-  options: TableOptions<T>
+  tableOptions: TableOptions<T>
 ): TableStateInstance<T> {
   const {
     columns,
     fetcher,
     key,
     reactTableOptions: reactTableOptionsProp,
-  } = options;
-  const tableConfig = { ...defaultTableConfig, ...options.config };
+  } = tableOptions;
 
   const context = useContext(TableusContext);
   const tableusConfig = context?.config;
   if (!tableusConfig) {
     throw new Error("Tableus config not provided");
   }
+  const tableConfig = mergeTableusDefaults(tableOptions.config, tableusConfig);
 
   const reactTableColumns = useMemo(
     () => translateColumns(columns, tableusConfig),
@@ -102,7 +102,7 @@ export function useTableus<T extends ReactTableGenerics>(
 
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
-    pageSize: options.config?.pageSize ?? 25,
+    pageSize: tableOptions.config?.pageSize ?? tableusConfig.pageSize ?? 25,
     ...(tableConfig.syncQueryParams && initialTableState.pagination),
   });
   const [sorting, setSorting] = useState<SortingState>(
@@ -176,7 +176,7 @@ export function useTableus<T extends ReactTableGenerics>(
     filterComponentProps: {
       filters,
       setFilters,
-      filterDefinitions: options.config?.filterDefinitions ?? [],
+      filterDefinitions: tableOptions.config?.filterDefinitions ?? [],
     },
     paginationComponentProps: {
       paginationState: pagination,
@@ -187,4 +187,16 @@ export function useTableus<T extends ReactTableGenerics>(
     selectedRows: [],
     reactTableInstance: reactTableInstance,
   };
+}
+
+function mergeTableusDefaults(
+  tableConfig: Partial<TableConfig> | undefined,
+  tableusConfig: TableusConfig
+): TableConfig {
+  if (tableConfig !== undefined) {
+    tableConfig.pageSize = tableConfig.pageSize ?? tableusConfig.pageSize;
+    tableConfig.pageSizeSelect =
+      tableConfig.pageSizeSelect ?? tableusConfig.pageSizeSelect;
+  }
+  return { ...defaultTableConfig, ...tableConfig };
 }

@@ -12,7 +12,7 @@ import { ComponentType } from "react";
 
 import { FilterProps } from "../context";
 
-export type ColumnValueType = "date" | "datetime";
+export type ColumnValueType = "date" | "datetime" | "time";
 
 export interface AdditionalColumnDef<T extends TableGenerics> {
   type?: ColumnValueType;

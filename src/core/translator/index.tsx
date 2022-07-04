@@ -1,39 +1,35 @@
 import React, { ComponentType } from "react";
 import { flexRender } from "../../helpers";
-import { TableUI, TableusConfig } from "../../context";
+import { TableusConfig } from "../../context";
 import { CellProps, ColumnDef, EasyCellProps } from "../types";
 import {
   ColumnDef as ReactTableColumnDef,
   Renderable,
   TableGenerics,
 } from "@tanstack/react-table";
+import {
+  DateCell as DefaultDateCell,
+  DateTimeCell as DefaultDateTimeCell,
+  TimeCell as DefaultTimeCell,
+  Link as DefaultLink,
+  Tooltip as DefaultTooltip,
+} from "./builtin-cells";
 
 type Wrapper<D extends Record<string, any>> = ComponentType<
   EasyCellProps<D> & { children: React.ReactNode }
 >;
 
 class ColumnTranslator<T extends TableGenerics> {
-  // private idColumnAccessor?: Accessor<T>;
-
   constructor(
     private columns: ColumnDef<T>[],
     private tableusConfig: TableusConfig
-  ) {
-    // this.idColumnAccessor = this.findIdColumn()?.accessor;
-  }
+  ) {}
 
   translateColumns(): ReactTableColumnDef<T>[] {
     return this.columns.map((column) => {
       return this.translateColumnDef(column);
-      // }) as ReactTableColumn<T>[]; // temorary fix
-    }); // temorary fix
+    });
   }
-
-  // findIdColumn(): SingleValueColumn<T> | undefined {
-  //   return this.columns.find((column) => "isId" in column && column.isId) as
-  //     | SingleValueColumn<T>
-  //     | undefined;
-  // }
 
   translateColumnDef(column: ColumnDef<T>) {
     const reactTableColumn = {
@@ -62,22 +58,21 @@ class ColumnTranslator<T extends TableGenerics> {
   buildWrapper(column: ColumnDef<T>) {
     const wrapperPipe: Wrapper<T>[] = [];
 
-    const link = column.meta?.link;
-    if (link !== undefined) {
-      const { Link } = this.tableusConfig;
-      if (Link === undefined) throw new Error("Link component is not defined");
+    const getLink = column.meta?.link;
+    if (getLink !== undefined) {
+      const LinkComponent = this.tableusConfig.Link ?? DefaultLink;
       wrapperPipe.push((props) => (
-        <Link href={link(props)}>{props.children}</Link>
+        <LinkComponent href={getLink(props)}>{props.children}</LinkComponent>
       ));
     }
 
-    const tooltip = column.meta?.tooltip;
-    if (tooltip !== undefined) {
-      const { Tooltip } = this.tableusConfig;
-      if (Tooltip === undefined)
-        throw new Error("Tooltip component is not defined");
+    const getTooltip = column.meta?.tooltip;
+    if (getTooltip !== undefined) {
+      const TooltipComponent = this.tableusConfig.Tooltip ?? DefaultTooltip;
       wrapperPipe.push((props) => (
-        <Tooltip text={tooltip(props)}>{props.children}</Tooltip>
+        <TooltipComponent text={getTooltip(props)}>
+          {props.children}
+        </TooltipComponent>
       ));
     }
 
@@ -90,20 +85,22 @@ class ColumnTranslator<T extends TableGenerics> {
       renderer: Renderable<EasyCellProps<T>>
     ) => {
       return wrapperPipe.reduce(
-        // (prev, Wrapper) => React.createElement(Wrapper, props, prev),
         (prev, Wrapper) => <Wrapper {...props}>{prev}</Wrapper>,
         flexRender(renderer, props.cellProps || props)
       );
     };
   }
 
-  buildDefaultCell(column: ColumnDef<T>): ComponentType<EasyCellProps<T>> {
-    const { EmptyValue } = this.tableusConfig;
+  buildDefaultCell(column: ColumnDef<T>): ComponentType<CellProps<T>> {
+    const EmptyValue = this.tableusConfig.EmptyValue ?? "";
 
     switch (column.meta?.type) {
       case "date":
         if (!this.tableusConfig.DateCell) {
-          throw new Error("DateCell is not defined");
+          return (props) => (
+            // @ts-ignore https://stackoverflow.com/questions/72392225/reactnode-is-not-a-valid-jsx-element
+            <DefaultDateCell {...props} EmptyValue={EmptyValue} />
+          );
         }
         const DateCell = this.tableusConfig.DateCell;
 
@@ -111,12 +108,26 @@ class ColumnTranslator<T extends TableGenerics> {
         return (props) => <DateCell {...props} />;
       case "datetime":
         if (!this.tableusConfig.DatetimeCell) {
-          throw new Error("DatetimeCell is not defined");
+          return (props) => (
+            // @ts-ignore https://stackoverflow.com/questions/72392225/reactnode-is-not-a-valid-jsx-element
+            <DefaultDateTimeCell {...props} EmptyValue={EmptyValue} />
+          );
         }
         const DateTimeCell = this.tableusConfig.DatetimeCell;
 
         // @ts-ignore https://stackoverflow.com/questions/72392225/reactnode-is-not-a-valid-jsx-element
         return (props) => <DateTimeCell {...props} />;
+      case "time":
+        if (!this.tableusConfig.TimeCell) {
+          return (props) => (
+            // @ts-ignore https://stackoverflow.com/questions/72392225/reactnode-is-not-a-valid-jsx-element
+            <DefaultTimeCell {...props} EmptyValue={EmptyValue} />
+          );
+        }
+        const TimeCell = this.tableusConfig.TimeCell;
+
+        // @ts-ignore https://stackoverflow.com/questions/72392225/reactnode-is-not-a-valid-jsx-jsx wrap selection with elementjsx wrap selection with elementjsx wrap selection with element
+        return (props) => <TimeCell {...props} />;
     }
     // @ts-ignore https://stackoverflow.com/questions/72392225/reactnode-is-not-a-valid-jsx-element
     return (props) => props.getValue() || flexRender(EmptyValue);
@@ -130,9 +141,6 @@ class ColumnTranslator<T extends TableGenerics> {
       data,
       cellProps: props as any,
     };
-    // if (this.idColumnAccessor) {
-    //   easyCellProps.id = props.row.values[this.idColumnAccessor as IdType<T>];
-    // }
     return easyCellProps;
   }
 }
