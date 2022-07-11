@@ -6,4 +6,4 @@
 - [Filters](filters.md)
 - [Pagination](pagination.md)
 - [Sorting](sorting.md)
-- [Ui](ui.md)
+- [UI](ui.md)
