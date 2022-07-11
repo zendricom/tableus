@@ -15,6 +15,9 @@ etc.), by externalizing those into seperate modules called **fetchers** and
 If your UI and backend API are already available as a package, then you are
 ready to go to create complex tables with **minimal effort** and **zero
 boilerplate**.
+Tableus is built on top of [Tanstack Table](https://tanstack.com/table/v8/) and
+often the API is the same. If you are already familiar with Tanstack Table
+(formerly React Table), then you will feel familiar with Tableus fast!
 
 ### Available Fetchers & UIs
 
