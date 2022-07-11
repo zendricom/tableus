@@ -124,3 +124,5 @@ const { tableusProps } = useTableus(table, {
 ```
 
 7. Done!
+
+### [Documentation](/docs/docs.md)
