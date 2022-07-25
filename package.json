@@ -1,6 +1,6 @@
 {
   "name": "@tableus/core",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "A react library for rendering highly configurable tables.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
