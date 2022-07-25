@@ -16,6 +16,7 @@ import { Fetcher, useFetcher } from "../fetcher/index";
 import { FilterComponentProps } from "../renderer/filtering";
 import { Props as TableusProps } from "../renderer/index";
 import { Props as PaginationProps } from "../renderer/pagination";
+import { useControlPagination } from "./pagination-controller";
 
 import {
   read as readQueryParams,
@@ -109,6 +110,8 @@ export function useTableus<T extends ReactTableGenerics>(
     initialTableState.sorting ?? []
   );
   const [filters, setFilters] = useState<FilteringState>(initialFilters);
+
+  useControlPagination(setPagination, pagination);
 
   const stateFunctions = useMemo(
     () => ({
