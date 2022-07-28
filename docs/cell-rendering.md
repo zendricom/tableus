@@ -15,7 +15,7 @@ To tell Tableus to render a specific column as a date, datetime or time, simply
 add the following to the column definition:
 
 ```typescript
-table.createDataColumn("id", {
+columnHelper.accessor("id", {
   header: "ID",
   meta: {
     type: "date", // 'date' | 'datetime' | 'time'
@@ -41,7 +41,7 @@ Tableus can render tooltips on top of the values that the cell would normally
 display. To do that, modify the column definition:
 
 ```typescript
-table.createDataColumn("id", {
+columnHelper.accessor("id", {
   header: "ID",
   meta: {
     tooltip: (props) => props.value,
@@ -49,25 +49,19 @@ table.createDataColumn("id", {
 });
 ```
 
-The tooltip function is passed the following props:
-
-```typescript
-{
-  value: any;
-  data: TableEntry;
-  cellProps: CellContext; // tanstack table cell props
-}
-```
+The tooltip function is passed the cell context (`CellContext`) as defined by tanstack table.
 
 #### Rendering Links
 
 Similar to rendering tooltips Tableus can also render links:
 
 ```typescript
-table.createDataColumn("id", {
+columnHelper.accessor("id", {
   header: "ID",
   meta: {
     link: (props) => `/users/${props.value}`,
   },
 });
 ```
+
+The link function is passed the cell context (`CellContext`) as defined by tanstack table.

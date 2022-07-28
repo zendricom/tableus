@@ -29,7 +29,6 @@
   },
   "peerDependencies": {
     "@tanstack/react-table": "8.5.2",
-    "dayjs": "^1.11.2",
     "deepmerge": "^4.2.2",
     "react": ">=16.0",
     "react-query": ">=2.26.4",
