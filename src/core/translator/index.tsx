@@ -1,7 +1,7 @@
 import React, { ComponentType } from "react";
 import { flexRender } from "../../helpers";
 import { TableusConfig } from "../../context";
-import { CellProps, ColumnDef, EasyCellProps } from "../types";
+import { CellProps, ColumnDef } from "../types";
 import {
   ColumnDef as ReactTableColumnDef,
   Renderable,
@@ -15,8 +15,8 @@ import {
   Tooltip as DefaultTooltip,
 } from "./builtin-cells";
 
-type Wrapper<D extends Record<string, any>> = ComponentType<
-  EasyCellProps<D> & { children: React.ReactNode }
+type Wrapper<T extends TableGenerics> = ComponentType<
+  CellProps<T> & { children: React.ReactNode }
 >;
 
 class ColumnTranslator<T extends TableGenerics> {
@@ -50,8 +50,7 @@ class ColumnTranslator<T extends TableGenerics> {
     const wrapper = this.buildWrapper(column);
 
     return (props: CellProps<T>) => {
-      const easyCellProps = this.makeEasyCellProps(props);
-      return wrapper(easyCellProps, Cell);
+      return wrapper(props, Cell);
     };
   }
 
@@ -80,13 +79,10 @@ class ColumnTranslator<T extends TableGenerics> {
   }
 
   buildWrapperFromPipe(wrapperPipe: Wrapper<T>[]) {
-    return (
-      props: EasyCellProps<T>,
-      renderer: Renderable<EasyCellProps<T>>
-    ) => {
+    return (props: CellProps<T>, renderer: Renderable<CellProps<T>>) => {
       return wrapperPipe.reduce(
         (prev, Wrapper) => <Wrapper {...props}>{prev}</Wrapper>,
-        flexRender(renderer, props.cellProps || props)
+        flexRender(renderer, props)
       );
     };
   }
@@ -131,17 +127,6 @@ class ColumnTranslator<T extends TableGenerics> {
     }
     // @ts-ignore https://stackoverflow.com/questions/72392225/reactnode-is-not-a-valid-jsx-element
     return (props) => props.getValue() || flexRender(EmptyValue);
-  }
-
-  makeEasyCellProps(props: CellProps<T>) {
-    const { getValue } = props;
-    const data = props.row.original;
-    const easyCellProps: EasyCellProps<T["Row"]> = {
-      value: getValue(),
-      data,
-      cellProps: props as any,
-    };
-    return easyCellProps;
   }
 }
 

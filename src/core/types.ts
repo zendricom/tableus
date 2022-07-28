@@ -16,8 +16,8 @@ export type ColumnValueType = "date" | "datetime" | "time";
 
 export interface AdditionalColumnDef<T extends TableGenerics> {
   type?: ColumnValueType;
-  link?: (props: EasyCellProps<T["Row"]>) => string;
-  tooltip?: (props: EasyCellProps<T["Row"]>) => string;
+  link?: (props: CellProps<T>) => string;
+  tooltip?: (props: CellProps<T>) => string;
 }
 
 export type ColumnDef<T extends TableGenerics> = ReactTableColumnDef<T> & {
@@ -30,12 +30,6 @@ export interface CellProps<T extends TableGenerics> {
   column: ReactTableColumn<T>;
   cell: ReactTableCell<T>;
   getValue: () => T["Value"];
-}
-
-export interface EasyCellProps<D extends Record<string, any>> {
-  value: any;
-  data: D;
-  cellProps: CellProps<{}>;
 }
 
 type FilterTypes = "select" | "search";
