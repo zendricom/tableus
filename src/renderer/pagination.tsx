@@ -1,26 +1,23 @@
 import React from "react";
-import {
-  TableGenerics,
-  TableInstance as ReactTableInstance,
-} from "@tanstack/react-table";
+import { Table as ReactTable } from "@tanstack/react-table";
 import { PaginationProps } from "../context";
 import { TableConfig } from "../core";
 import { PaginationState } from "../core/types";
 import { useTableusConfig } from "../helpers";
 
-export interface Props<T extends TableGenerics> {
+export interface Props<D extends Record<string, any>> {
   paginationState: PaginationState;
-  reactTableInstance: ReactTableInstance<T>;
+  reactTable: ReactTable<D>;
   tableConfig: TableConfig;
   position: "top" | "bottom" | "custom";
 }
 
-export function Pagination<T extends TableGenerics>({
+export function Pagination<D extends Record<string, any>>({
   paginationState,
-  reactTableInstance,
+  reactTable,
   tableConfig,
   position,
-}: Props<T>) {
+}: Props<D>) {
   const config = useTableusConfig();
   const { tableUI } = config;
 
@@ -29,7 +26,7 @@ export function Pagination<T extends TableGenerics>({
     throw new Error("No Pagination component provided");
   }
   const props: PaginationProps = {
-    paginationMethods: reactTableInstance,
+    paginationMethods: reactTable,
     paginationState: {
       ...paginationState,
     },

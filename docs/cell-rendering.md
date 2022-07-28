@@ -55,7 +55,7 @@ The tooltip function is passed the following props:
 {
   value: any;
   data: TableEntry;
-  cellProps: CellProps; // tanstack table cell props
+  cellProps: CellContext; // tanstack table cell props
 }
 ```
 

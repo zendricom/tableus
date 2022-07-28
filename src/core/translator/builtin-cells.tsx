@@ -1,14 +1,15 @@
+import { CellContext, flexRender } from "@tanstack/react-table";
 import React from "react";
-import { TableConfig } from "..";
 import { LinkProps, TableusConfig, TooltipProps } from "../../context";
-import { flexRender } from "../../helpers";
-import { CellProps } from "../types";
 
-type Props<T> = CellProps<T> & {
+type Props<
+  D extends Record<string, any>,
+  T extends any = unknown
+> = CellContext<D, T> & {
   EmptyValue: TableusConfig["EmptyValue"];
 };
 
-export function DateCell<T>(props: Props<T>) {
+export function DateCell<D>(props: Props<D>) {
   const date = parseDateFromProps(props);
   if (date === null) {
     return flexRender(props.EmptyValue, props);
@@ -16,7 +17,7 @@ export function DateCell<T>(props: Props<T>) {
   return <span>{date.toLocaleDateString()}</span>;
 }
 
-export function DateTimeCell<T>(props: Props<T>) {
+export function DateTimeCell<D>(props: Props<D>) {
   const date = parseDateFromProps(props);
   if (date === null) {
     return flexRender(props.EmptyValue, props);
@@ -24,7 +25,7 @@ export function DateTimeCell<T>(props: Props<T>) {
   return <span>{date.toLocaleString()}</span>;
 }
 
-export function TimeCell<T>(props: Props<T>) {
+export function TimeCell<D>(props: Props<D>) {
   const date = parseDateFromProps(props);
   if (date === null) {
     return flexRender(props.EmptyValue, props);
@@ -32,7 +33,7 @@ export function TimeCell<T>(props: Props<T>) {
   return <span>{date.toLocaleTimeString()}</span>;
 }
 
-function parseDateFromProps<T>(props: Props<T>) {
+function parseDateFromProps<D>(props: Props<D>) {
   const { getValue } = props;
   const value = getValue();
 

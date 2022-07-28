@@ -1,4 +1,5 @@
 import {
+  CellContext,
   PaginationInstance as ReactTablePaginationInstance,
   SortingColumn,
 } from "@tanstack/react-table";
@@ -6,14 +7,7 @@ import { ComponentType, createContext, ReactNode, useMemo } from "react";
 import React from "react";
 
 import { PaginationTableConfig, TableConfig } from "./core";
-import {
-  CellProps,
-  CustomFilterDefinition,
-  CustomFilterState,
-  FilterDefinition,
-  FilterState,
-  PaginationState,
-} from "./core/types";
+import { FilterDefinition, FilterState, PaginationState } from "./core/types";
 import { FetcherState } from "./fetcher";
 import {
   SearchFilterDef,
@@ -88,9 +82,9 @@ export type TableusConfig = Pick<
 
   EmptyValue?: (() => ReactNode) | string | number | null | undefined;
 
-  DateCell?: (props: CellProps<{}>) => ReactNode;
-  DatetimeCell?: (props: CellProps<{}>) => ReactNode;
-  TimeCell?: (props: CellProps<{}>) => ReactNode;
+  DateCell?: (props: CellContext<unknown, any>) => ReactNode;
+  DatetimeCell?: (props: CellContext<unknown, any>) => ReactNode;
+  TimeCell?: (props: CellContext<unknown, any>) => ReactNode;
 
   Link?: ComponentType<LinkProps>;
   Tooltip?: ComponentType<TooltipProps>;

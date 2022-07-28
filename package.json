@@ -14,7 +14,7 @@
   "author": "moritz@zendri.com",
   "license": "ISC",
   "devDependencies": {
-    "@tanstack/react-table": "^8.0.0-beta.9",
+    "@tanstack/react-table": "8.5.2",
     "@types/react": "^17.0.38",
     "@typescript-eslint/eslint-plugin": "^5.27.0",
     "@typescript-eslint/parser": "^5.27.0",
@@ -28,7 +28,7 @@
     "react-dom": "^16.14.0"
   },
   "peerDependencies": {
-    "@tanstack/react-table": ">=8.0.0-beta.9",
+    "@tanstack/react-table": "8.5.2",
     "dayjs": "^1.11.2",
     "deepmerge": "^4.2.2",
     "react": ">=16.0",

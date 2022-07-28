@@ -1,36 +1,47 @@
 import {
   Cell as ReactTableCell,
   Column as ReactTableColumn,
-  ColumnDef as ReactTableColumnDef,
+  ColumnDef,
   PaginationState as ReactTablePaginationState,
   Row as ReactTableRow,
   SortingState,
-  TableGenerics,
-  TableInstance as ReactTableInstance,
+  Table as ReactTable,
+  createColumnHelper,
+  CellContext,
+  RowData,
 } from "@tanstack/react-table";
 import { ComponentType } from "react";
 
 import { FilterProps } from "../context";
 
 export type ColumnValueType = "date" | "datetime" | "time";
+// const columnHelper = createColumnHelper<{
+//   name: string;
+//   id: string;
+// }>();
+// columnHelper.accessor((row) => row.name, {
+//   id: "name",
+//   cell:
+// });
 
-export interface AdditionalColumnDef<T extends TableGenerics> {
-  type?: ColumnValueType;
-  link?: (props: CellProps<T>) => string;
-  tooltip?: (props: CellProps<T>) => string;
+declare module "@tanstack/table-core" {
+  interface ColumnMeta<TData extends RowData, TValue> {
+    type?: ColumnValueType;
+    link?: (props: CellContext<TData, TValue>) => string;
+    tooltip?: (props: CellContext<TData, TValue>) => string;
+  }
 }
 
-export type ColumnDef<T extends TableGenerics> = ReactTableColumnDef<T> & {
-  meta?: AdditionalColumnDef<T>;
-};
-
-export interface CellProps<T extends TableGenerics> {
-  instance: ReactTableInstance<T>;
-  row: ReactTableRow<T>;
-  column: ReactTableColumn<T>;
-  cell: ReactTableCell<T>;
-  getValue: () => T["Value"];
-}
+// export interface CellContext<
+//   D extends Record<string, any>,
+//   T extends any = unknown
+// > {
+//   instance: ReactTable<D>;
+//   row: ReactTableRow<D>;
+//   column: ReactTableColumn<D, T>;
+//   cell: ReactTableCell<D, T>;
+//   getValue: () => T["Value"];
+// }
 
 type FilterTypes = "select" | "search";
 

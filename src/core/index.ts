@@ -1,12 +1,11 @@
 import {
-  createTable as createReactTable,
   getCoreRowModel,
-  ReactTableGenerics,
   SortingState,
+  useReactTable,
+  TableOptions as ReactTableOptions,
   Table as ReactTable,
-  TableInstance as ReactTableInstance,
-  useTableInstance,
-  UseTableInstanceOptions,
+  createColumnHelper,
+  ColumnDef,
 } from "@tanstack/react-table";
 import deepmerge from "deepmerge";
 import { useContext, useEffect, useMemo, useState } from "react";
@@ -24,8 +23,6 @@ import {
 } from "./query-param-sync";
 import { translateColumns } from "./translator/index";
 import {
-  AdditionalColumnDef,
-  ColumnDef,
   FilterDefinition,
   FilteringState,
   PaginationState,
@@ -45,27 +42,23 @@ export type TableConfig = PaginationTableConfig & {
   filterDefinitions: FilterDefinition[];
 };
 
-export interface TableOptions<T extends ReactTableGenerics> {
-  columns: ColumnDef<T>[];
-  fetcher: Fetcher<T["Row"]>;
+export interface TableOptions<D extends Record<string, any>> {
+  columns: ColumnDef<D, any>[];
+  fetcher: Fetcher<D>;
   key: string;
   config?: Partial<TableConfig>;
-  reactTableOptions?: Partial<UseTableInstanceOptions<T>>;
+  reactTableOptions?: Partial<ReactTableOptions<D>>;
 }
 
-export interface TableStateInstance<T extends ReactTableGenerics> {
-  tableusProps: TableusProps<T>;
+export interface TableStateInstance<D extends Record<string, any>> {
+  tableusProps: TableusProps<D>;
   selectedRows: any[];
-  reactTableInstance: ReactTableInstance<T>;
+  reactTable: ReactTable<D>;
 
   filterComponentProps: Omit<FilterComponentProps, "filterKey">;
-  paginationComponentProps: PaginationProps<T>;
+  paginationComponentProps: PaginationProps<D>;
 }
 
-export function createTable<D extends Record<string, any>>() {
-  const table = createReactTable().setRowType<D>();
-  return table.setColumnMetaType<AdditionalColumnDef<typeof table.generics>>();
-}
 const defaultTableConfig: TableConfig = {
   pagination: false,
   sorting: false,
@@ -74,10 +67,9 @@ const defaultTableConfig: TableConfig = {
   filterDefinitions: [],
 };
 
-export function useTableus<T extends ReactTableGenerics>(
-  table: ReactTable<T>,
-  tableOptions: TableOptions<T>
-): TableStateInstance<T> {
+export function useTableus<D extends Record<string, any>>(
+  tableOptions: TableOptions<D>
+) {
   const {
     columns,
     fetcher,
@@ -131,7 +123,7 @@ export function useTableus<T extends ReactTableGenerics>(
     });
   }, [pagination, sorting, filters, tableConfig.syncQueryParams]);
 
-  const fetcherState = useFetcher<T["Row"]>({
+  const fetcherState = useFetcher<D>({
     fetcher,
     tableState: { pagination, sorting, filters },
     tableConfig,
@@ -145,8 +137,8 @@ export function useTableus<T extends ReactTableGenerics>(
     }
   }, [paginationState]);
 
-  const reactTableOptions: UseTableInstanceOptions<T> = useMemo(() => {
-    const config: UseTableInstanceOptions<T> = {
+  const reactTableOptions: ReactTableOptions<D> = useMemo(() => {
+    const config: ReactTableOptions<D> = {
       data: data ?? [],
       columns: reactTableColumns,
 
@@ -163,14 +155,14 @@ export function useTableus<T extends ReactTableGenerics>(
       getCoreRowModel: getCoreRowModel(),
     };
     if (reactTableOptionsProp === undefined) return config;
-    return deepmerge<UseTableInstanceOptions<T>>(config, reactTableOptionsProp);
+    return deepmerge<ReactTableOptions<D>>(config, reactTableOptionsProp);
   }, [data, reactTableColumns, reactTableOptionsProp]);
 
-  const reactTableInstance = useTableInstance(table, reactTableOptions);
+  const reactTable = useReactTable(reactTableOptions);
 
   return {
     tableusProps: {
-      reactTableInstance,
+      reactTable,
       tableConfig,
       fetcherState,
       tableState: { pagination, sorting, filters },
@@ -183,12 +175,12 @@ export function useTableus<T extends ReactTableGenerics>(
     },
     paginationComponentProps: {
       paginationState: pagination,
-      reactTableInstance: reactTableInstance,
+      reactTable: reactTable,
       tableConfig: tableConfig,
       position: "custom",
     },
     selectedRows: [],
-    reactTableInstance: reactTableInstance,
+    reactTable: reactTable,
   };
 }
 

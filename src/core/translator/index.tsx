@@ -1,11 +1,12 @@
 import React, { ComponentType } from "react";
-import { flexRender } from "../../helpers";
 import { TableusConfig } from "../../context";
-import { CellProps, ColumnDef } from "../types";
 import {
+  CellContext,
+  ColumnDef,
   ColumnDef as ReactTableColumnDef,
+  ColumnDefTemplate,
+  flexRender,
   Renderable,
-  TableGenerics,
 } from "@tanstack/react-table";
 import {
   DateCell as DefaultDateCell,
@@ -15,23 +16,24 @@ import {
   Tooltip as DefaultTooltip,
 } from "./builtin-cells";
 
-type Wrapper<T extends TableGenerics> = ComponentType<
-  CellProps<T> & { children: React.ReactNode }
->;
+type Wrapper<
+  D extends Record<string, any>,
+  T extends any = unknown
+> = ComponentType<CellContext<D, T> & { children: React.ReactNode }>;
 
-class ColumnTranslator<T extends TableGenerics> {
+class ColumnTranslator<D extends Record<string, any>> {
   constructor(
-    private columns: ColumnDef<T>[],
+    private columns: ColumnDef<D>[],
     private tableusConfig: TableusConfig
   ) {}
 
-  translateColumns(): ReactTableColumnDef<T>[] {
+  translateColumns(): ReactTableColumnDef<D, any>[] {
     return this.columns.map((column) => {
       return this.translateColumnDef(column);
     });
   }
 
-  translateColumnDef(column: ColumnDef<T>) {
+  translateColumnDef(column: ColumnDef<D, any>) {
     const reactTableColumn = {
       ...column,
     };
@@ -39,23 +41,23 @@ class ColumnTranslator<T extends TableGenerics> {
     reactTableColumn.cell = this.buildCell(
       column,
       column.cell || this.buildDefaultCell(column)
-    ) as any;
+    );
     return reactTableColumn;
   }
 
   buildCell(
-    column: ColumnDef<T>,
-    Cell: Renderable<CellProps<T>>
-  ): Renderable<CellProps<T>> {
+    column: ColumnDef<D>,
+    Cell: Renderable<CellContext<D, any>>
+  ): ColumnDefTemplate<CellContext<D, any>> {
     const wrapper = this.buildWrapper(column);
 
-    return (props: CellProps<T>) => {
+    return (props: CellContext<D, any>) => {
       return wrapper(props, Cell);
     };
   }
 
-  buildWrapper(column: ColumnDef<T>) {
-    const wrapperPipe: Wrapper<T>[] = [];
+  buildWrapper(column: ColumnDef<D>) {
+    const wrapperPipe: Wrapper<D>[] = [];
 
     const getLink = column.meta?.link;
     if (getLink !== undefined) {
@@ -78,8 +80,11 @@ class ColumnTranslator<T extends TableGenerics> {
     return this.buildWrapperFromPipe(wrapperPipe);
   }
 
-  buildWrapperFromPipe(wrapperPipe: Wrapper<T>[]) {
-    return (props: CellProps<T>, renderer: Renderable<CellProps<T>>) => {
+  buildWrapperFromPipe(wrapperPipe: Wrapper<D>[]) {
+    return (
+      props: CellContext<D, any>,
+      renderer: Renderable<CellContext<D, any>>
+    ) => {
       return wrapperPipe.reduce(
         (prev, Wrapper) => <Wrapper {...props}>{prev}</Wrapper>,
         flexRender(renderer, props)
@@ -87,7 +92,7 @@ class ColumnTranslator<T extends TableGenerics> {
     };
   }
 
-  buildDefaultCell(column: ColumnDef<T>): ComponentType<CellProps<T>> {
+  buildDefaultCell(column: ColumnDef<D>): ComponentType<CellContext<D, any>> {
     const EmptyValue = this.tableusConfig.EmptyValue ?? "";
 
     switch (column.meta?.type) {
@@ -130,8 +135,8 @@ class ColumnTranslator<T extends TableGenerics> {
   }
 }
 
-export function translateColumns<T extends TableGenerics>(
-  columns: ColumnDef<T>[],
+export function translateColumns<D extends Record<string, any>>(
+  columns: ColumnDef<D>[],
   tableusConfig: TableusConfig
 ) {
   return new ColumnTranslator(columns, tableusConfig).translateColumns();

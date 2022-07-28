@@ -1,29 +1,26 @@
 import React, { ReactNode } from "react";
-import {
-  TableGenerics,
-  TableInstance as ReactTableInstance,
-} from "@tanstack/react-table";
+import { flexRender, Table as ReactTable } from "@tanstack/react-table";
 import { TableConfig } from "../core";
 import { FetcherState } from "../fetcher";
 import { StateFunctions, TableState } from "../core/types";
 import { Pagination } from "./pagination";
 import { useTableusConfig } from "../helpers";
 
-export interface Props<T extends TableGenerics> {
-  reactTableInstance: ReactTableInstance<T>;
+export interface Props<D extends Record<string, any>> {
+  reactTable: ReactTable<D>;
   tableState: TableState;
   tableConfig: TableConfig;
-  fetcherState: FetcherState<T["Row"]>;
+  fetcherState: FetcherState<D>;
   stateFunctions: StateFunctions;
 }
 
-export function TableusRenderer<T extends TableGenerics>({
-  reactTableInstance,
+export function TableusRenderer<D extends Record<string, any>>({
+  reactTable,
   tableConfig,
   fetcherState,
   tableState,
   stateFunctions,
-}: Props<T>) {
+}: Props<D>) {
   const config = useTableusConfig();
   const { tableUI } = config;
 
@@ -32,8 +29,8 @@ export function TableusRenderer<T extends TableGenerics>({
   return (
     <>
       {tableConfig.pagination && (
-        <Pagination<T["Row"]>
-          reactTableInstance={reactTableInstance}
+        <Pagination<D>
+          reactTable={reactTable}
           paginationState={tableState.pagination}
           tableConfig={tableConfig}
           position="top"
@@ -41,7 +38,7 @@ export function TableusRenderer<T extends TableGenerics>({
       )}
       <tableUI.Table {...tableComponentsProps}>
         <tableUI.TableHead {...tableComponentsProps}>
-          {reactTableInstance.getHeaderGroups().map((headerGroup) => (
+          {reactTable.getHeaderGroups().map((headerGroup) => (
             <tableUI.TableHeadRow
               key={headerGroup.id}
               {...tableComponentsProps}
@@ -55,7 +52,10 @@ export function TableusRenderer<T extends TableGenerics>({
                   >
                     {header.isPlaceholder
                       ? null
-                      : (header.renderHeader() as ReactNode)}
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                   </tableUI.TableHeadCell>
                 );
               })}
@@ -63,11 +63,11 @@ export function TableusRenderer<T extends TableGenerics>({
           ))}
         </tableUI.TableHead>
         <tableUI.TableBody {...tableComponentsProps}>
-          {reactTableInstance.getRowModel().rows.map((row) => (
+          {reactTable.getRowModel().rows.map((row) => (
             <tableUI.TableRow key={row.id} {...tableComponentsProps}>
               {row.getVisibleCells().map((cell) => (
                 <tableUI.TableCell key={cell.id} {...tableComponentsProps}>
-                  {cell.renderCell() as ReactNode}
+                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </tableUI.TableCell>
               ))}
             </tableUI.TableRow>
@@ -75,8 +75,8 @@ export function TableusRenderer<T extends TableGenerics>({
         </tableUI.TableBody>
       </tableUI.Table>
       {tableConfig.pagination && (
-        <Pagination<T["Row"]>
-          reactTableInstance={reactTableInstance}
+        <Pagination<D>
+          reactTable={reactTable}
           paginationState={tableState.pagination}
           tableConfig={tableConfig}
           position="bottom"

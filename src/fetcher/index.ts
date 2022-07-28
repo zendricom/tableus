@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { PaginationState as ReactTablePaginationState } from "@tanstack/react-table";
-import { TableInstance as ReactTableInstance } from "@tanstack/react-table";
+import { Table as ReactTable } from "@tanstack/react-table";
 import { TableConfig } from "../core";
 
 import { PaginationState, TableState } from "../core/types";
