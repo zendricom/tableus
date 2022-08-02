@@ -44,7 +44,7 @@ display. To do that, modify the column definition:
 columnHelper.accessor("id", {
   header: "ID",
   meta: {
-    tooltip: (props) => props.value,
+    tooltip: (props) => props.getValue(),
   },
 });
 ```
@@ -59,7 +59,7 @@ Similar to rendering tooltips Tableus can also render links:
 columnHelper.accessor("id", {
   header: "ID",
   meta: {
-    link: (props) => `/users/${props.value}`,
+    link: (props) => `/users/${props.getValue()}`,
   },
 });
 ```
