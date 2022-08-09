@@ -1,12 +1,6 @@
 import {
-  Cell as ReactTableCell,
-  Column as ReactTableColumn,
-  ColumnDef,
   PaginationState as ReactTablePaginationState,
-  Row as ReactTableRow,
   SortingState,
-  Table as ReactTable,
-  createColumnHelper,
   CellContext,
   RowData,
 } from "@tanstack/react-table";
@@ -15,14 +9,6 @@ import { ComponentType } from "react";
 import { FilterProps } from "../context";
 
 export type ColumnValueType = "date" | "datetime" | "time";
-// const columnHelper = createColumnHelper<{
-//   name: string;
-//   id: string;
-// }>();
-// columnHelper.accessor((row) => row.name, {
-//   id: "name",
-//   cell:
-// });
 
 declare module "@tanstack/table-core" {
   interface ColumnMeta<TData extends RowData, TValue> {
@@ -32,18 +18,7 @@ declare module "@tanstack/table-core" {
   }
 }
 
-// export interface CellContext<
-//   D extends Record<string, any>,
-//   T extends any = unknown
-// > {
-//   instance: ReactTable<D>;
-//   row: ReactTableRow<D>;
-//   column: ReactTableColumn<D, T>;
-//   cell: ReactTableCell<D, T>;
-//   getValue: () => T["Value"];
-// }
-
-type FilterTypes = "select" | "search";
+type FilterTypes = "select" | "search" | "check";
 
 export interface CoreFilterState {
   type: string;
