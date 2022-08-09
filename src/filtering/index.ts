@@ -30,11 +30,33 @@ export interface SelectFilterState {
   key: string;
   value: SelectOption["value"] | SelectOption["value"][];
 }
+
 export function defineSelectFilter(
   args: Omit<SelectFilterDef, "type">
 ): SelectFilterDef {
   return {
     type: "select",
+    ...args,
+  };
+}
+
+export interface CheckFilterDef extends BuiltinFilterDefinition {
+  type: "check";
+  label: string;
+  defaultValue?: boolean;
+}
+
+export interface CheckFilterState {
+  type: "check";
+  key: string;
+  value: boolean;
+}
+
+export function defineCheckFilter(
+  args: Omit<CheckFilterDef, "type">
+): CheckFilterDef {
+  return {
+    type: "check",
     ...args,
   };
 }

@@ -72,3 +72,7 @@ export function useDebouncedCallback<A extends any[]>(
     }, wait);
   };
 }
+
+export function assertUnreachable(x: never): never {
+  throw new Error("Unreachable");
+}

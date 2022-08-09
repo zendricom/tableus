@@ -38,7 +38,7 @@ export type CustomFilterState<D> = CoreFilterState & {
 export type FilterState = BuiltinFilterState | CustomFilterState<any>;
 
 export interface CoreFilterDefinition {
-  type: string;
+  type: FilterTypes | "custom";
   key: string;
   defaultValue?: any;
 }

@@ -9,12 +9,14 @@ import {
 } from "../core/types";
 import { FetcherState } from "../fetcher";
 import {
+  CheckFilterDef,
+  CheckFilterState,
   SearchFilterDef,
   SearchFilterState,
   SelectFilterDef,
   SelectFilterState,
 } from "../filtering";
-import { useTableusConfig } from "../helpers";
+import { assertUnreachable, useTableusConfig } from "../helpers";
 
 export interface FilterContainerProps<D extends Record<string, any>> {
   filters: FilteringState;
@@ -128,7 +130,25 @@ export function FilterComponent({
           )}
         />
       );
+    case "check":
+      const CheckFilter = tableUI.CheckFilter;
+      if (CheckFilter === undefined) {
+        throw new Error("CheckFilter component is not defined");
+      }
+      return (
+        <CheckFilter
+          filterDefinition={filterDefinition as CheckFilterDef}
+          filter={filter as CheckFilterState}
+          key={filterDefinition.key}
+          props={props}
+          setFilter={getSetFilterFunc<CheckFilterState>(
+            filterDefinition.key,
+            "check"
+          )}
+        />
+      );
+
     default:
-      throw new Error("Unknown filter type");
+      assertUnreachable(filterDefinition);
   }
 }

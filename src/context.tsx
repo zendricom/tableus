@@ -10,6 +10,8 @@ import { PaginationTableConfig, TableConfig } from "./core";
 import { FilterDefinition, FilterState, PaginationState } from "./core/types";
 import { FetcherState } from "./fetcher";
 import {
+  CheckFilterDef,
+  CheckFilterState,
   SearchFilterDef,
   SearchFilterState,
   SelectFilterDef,
@@ -72,6 +74,7 @@ export interface TableUI {
 
   SelectFilter?: ComponentType<FilterProps<SelectFilterState, SelectFilterDef>>;
   SearchFilter?: ComponentType<FilterProps<SearchFilterState, SearchFilterDef>>;
+  CheckFilter?: ComponentType<FilterProps<CheckFilterState, CheckFilterDef>>;
 }
 
 export type TableusConfig = Pick<
