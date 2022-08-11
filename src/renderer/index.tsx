@@ -31,10 +31,10 @@ export function TableusRenderer<D extends Record<string, any>>({
       {tableConfig.pagination &&
         (tableConfig.showPagination === "top" ||
           tableConfig.showPagination === "both") && (
-          <Pagination<D>
-            reactTable={reactTable}
+          <Pagination
+            paginationMethods={reactTable}
             paginationState={tableState.pagination}
-            tableConfig={tableConfig}
+            paginationConfig={tableConfig}
             position="top"
           />
         )}
@@ -79,10 +79,10 @@ export function TableusRenderer<D extends Record<string, any>>({
       {tableConfig.pagination &&
         (tableConfig.showPagination === "bottom" ||
           tableConfig.showPagination === "both") && (
-          <Pagination<D>
-            reactTable={reactTable}
+          <Pagination
+            paginationMethods={reactTable}
             paginationState={tableState.pagination}
-            tableConfig={tableConfig}
+            paginationConfig={tableConfig}
             position="bottom"
           />
         )}

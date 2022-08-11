@@ -10,11 +10,10 @@ import {
 import deepmerge from "deepmerge";
 import { useContext, useEffect, useMemo, useState } from "react";
 
-import { TableusConfig, TableusContext } from "../context";
+import { PaginationProps, TableusConfig, TableusContext } from "../context";
 import { Fetcher, useFetcher } from "../fetcher/index";
 import { FilterComponentProps } from "../renderer/filtering";
 import { Props as TableusProps } from "../renderer/index";
-import { Props as PaginationProps } from "../renderer/pagination";
 import { useControlPagination } from "./pagination-controller";
 
 import {
@@ -57,7 +56,7 @@ export interface TableStateInstance<D extends Record<string, any>> {
   reactTable: ReactTable<D>;
 
   filterComponentProps: Omit<FilterComponentProps, "filterKey">;
-  paginationComponentProps: PaginationProps<D>;
+  paginationComponentProps: PaginationProps;
 }
 
 const defaultTableConfig: TableConfig = {
@@ -161,6 +160,12 @@ export function useTableus<D extends Record<string, any>>(
   }, [data, reactTableColumns, reactTableOptionsProp]);
 
   const reactTable = useReactTable(reactTableOptions);
+  const paginationProps: PaginationProps = {
+    paginationState: pagination,
+    paginationMethods: reactTable,
+    paginationConfig: tableConfig,
+    position: "custom",
+  };
 
   return {
     tableusProps: {
@@ -175,12 +180,7 @@ export function useTableus<D extends Record<string, any>>(
       setFilters,
       filterDefinitions: tableOptions.config?.filterDefinitions ?? [],
     },
-    paginationComponentProps: {
-      paginationState: pagination,
-      reactTable: reactTable,
-      tableConfig: tableConfig,
-      position: "custom",
-    },
+    paginationProps,
     selectedRows: [],
     reactTable: reactTable,
   };
