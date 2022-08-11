@@ -46,4 +46,16 @@ const tableusConfig: TableusConfig = {
 <TableusContextProvider config={tableusConfig}>
 ```
 
+By default tableus will render a pagination component above and below the
+table. You can configure this behavior with the `showPagination` property.
+
+```typescript
+const { tableusProps } = useTableus(table, {
+  config: {
+    pagination: true,
+    showPagination: "both",
+  },
+});
+```
+
 That's all it takes!

@@ -31,6 +31,7 @@ import {
 
 export interface PaginationTableConfig {
   pagination: boolean;
+  showPagination?: "top" | "bottom" | "both" | "none";
   pageSize?: number;
   pageSizeSelect?: number[];
 }
@@ -61,6 +62,7 @@ export interface TableStateInstance<D extends Record<string, any>> {
 
 const defaultTableConfig: TableConfig = {
   pagination: false,
+  showPagination: "both",
   sorting: false,
   rowSelect: false,
   syncQueryParams: true,

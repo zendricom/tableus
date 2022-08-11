@@ -28,14 +28,16 @@ export function TableusRenderer<D extends Record<string, any>>({
 
   return (
     <>
-      {tableConfig.pagination && (
-        <Pagination<D>
-          reactTable={reactTable}
-          paginationState={tableState.pagination}
-          tableConfig={tableConfig}
-          position="top"
-        />
-      )}
+      {tableConfig.pagination &&
+        (tableConfig.showPagination === "top" ||
+          tableConfig.showPagination === "both") && (
+          <Pagination<D>
+            reactTable={reactTable}
+            paginationState={tableState.pagination}
+            tableConfig={tableConfig}
+            position="top"
+          />
+        )}
       <tableUI.Table {...tableComponentsProps}>
         <tableUI.TableHead {...tableComponentsProps}>
           {reactTable.getHeaderGroups().map((headerGroup) => (
@@ -74,14 +76,16 @@ export function TableusRenderer<D extends Record<string, any>>({
           ))}
         </tableUI.TableBody>
       </tableUI.Table>
-      {tableConfig.pagination && (
-        <Pagination<D>
-          reactTable={reactTable}
-          paginationState={tableState.pagination}
-          tableConfig={tableConfig}
-          position="bottom"
-        />
-      )}
+      {tableConfig.pagination &&
+        (tableConfig.showPagination === "bottom" ||
+          tableConfig.showPagination === "both") && (
+          <Pagination<D>
+            reactTable={reactTable}
+            paginationState={tableState.pagination}
+            tableConfig={tableConfig}
+            position="bottom"
+          />
+        )}
     </>
   );
 }
