@@ -57,7 +57,12 @@ export function FilterComponent({
     type: F["type"]
   ) => {
     return (value: F["value"] | ((value: F["value"]) => void)) => {
-      if (value === undefined || value === null || value === "") {
+      if (
+        value === undefined ||
+        value === null ||
+        value === "" ||
+        (value instanceof Array && value.length === 0)
+      ) {
         setFilters(filters.filter((f) => f.key !== key));
         return;
       }
