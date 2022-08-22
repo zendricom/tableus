@@ -61,7 +61,8 @@ export function FilterComponent({
         value === undefined ||
         value === null ||
         value === "" ||
-        (value instanceof Array && value.length === 0)
+        (value instanceof Array && value.length === 0) ||
+        value === false
       ) {
         setFilters(filters.filter((f) => f.key !== key));
         return;
