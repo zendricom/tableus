@@ -56,7 +56,7 @@ export function TableusRenderer<D extends Record<string, any>>({
                       ? null
                       : flexRender(
                           header.column.columnDef.header,
-                          header.getContext()
+                          header.getContext(),
                         )}
                   </tableUI.TableHeadCell>
                 );

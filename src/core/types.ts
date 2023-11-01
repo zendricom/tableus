@@ -48,7 +48,7 @@ export interface BuiltinFilterDefinition extends CoreFilterDefinition {
 }
 
 export function isBuiltinFilterDefinition(
-  filter: FilterDefinition
+  filter: FilterDefinition,
 ): filter is BuiltinFilterDefinition {
   return filter.type !== "custom";
 }
@@ -58,7 +58,7 @@ export type CustomFilterRenderer<S extends CustomFilterState<any>> =
 
 export type CustomFilterTranslator<S extends CustomFilterState<any>> = (
   filter: S,
-  args: any
+  args: any,
 ) => any;
 
 export interface CustomFilterDefinition<S extends CustomFilterState<any>>

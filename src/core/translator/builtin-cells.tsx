@@ -4,12 +4,12 @@ import { LinkProps, TableusConfig, TooltipProps } from "../../context";
 
 type Props<
   D extends Record<string, any>,
-  T extends any = unknown
+  T extends any = unknown,
 > = CellContext<D, T> & {
   EmptyValue: TableusConfig["EmptyValue"];
 };
 
-export function DateCell<D>(props: Props<D>) {
+export function DateCell<D extends Record<string, any>>(props: Props<D>) {
   const date = parseDateFromProps(props);
   if (date === null) {
     return flexRender(props.EmptyValue, props);
@@ -17,7 +17,7 @@ export function DateCell<D>(props: Props<D>) {
   return <span>{date.toLocaleDateString()}</span>;
 }
 
-export function DateTimeCell<D>(props: Props<D>) {
+export function DateTimeCell<D extends Record<string, any>>(props: Props<D>) {
   const date = parseDateFromProps(props);
   if (date === null) {
     return flexRender(props.EmptyValue, props);
@@ -25,7 +25,7 @@ export function DateTimeCell<D>(props: Props<D>) {
   return <span>{date.toLocaleString()}</span>;
 }
 
-export function TimeCell<D>(props: Props<D>) {
+export function TimeCell<D extends Record<string, any>>(props: Props<D>) {
   const date = parseDateFromProps(props);
   if (date === null) {
     return flexRender(props.EmptyValue, props);
@@ -33,7 +33,7 @@ export function TimeCell<D>(props: Props<D>) {
   return <span>{date.toLocaleTimeString()}</span>;
 }
 
-function parseDateFromProps<D>(props: Props<D>) {
+function parseDateFromProps<D extends Record<string, any>>(props: Props<D>) {
   const { getValue } = props;
   const value = getValue();
 
@@ -50,7 +50,7 @@ function parseDateFromProps<D>(props: Props<D>) {
   }
   throw new Error(
     "Invalid date value for builtin cell, expected number, string or Date, got " +
-      typeof value
+      typeof value,
   );
 }
 
